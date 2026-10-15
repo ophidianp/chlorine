@@ -195,4 +195,4 @@ to implement them. Now, this isnt a promise, but I want to learn how to code mys
 k byee.
 ## License
 
-All Rights Reserved. See [LICENSE](LICENSE).
+MIT Licence. See [LICENSE](LICENSE).
