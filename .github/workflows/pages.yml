@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - main
+      - ophidianp-chlorine-website
     paths:
-      - "chlorine-website/**"
+      - "*.html"
+      - "assets/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -32,7 +34,7 @@ jobs:
       - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:
-          path: chlorine-website
+          path: .
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
