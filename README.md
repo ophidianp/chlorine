@@ -191,8 +191,7 @@ content.
 ## Note
 This project is FULLY AI generated. Except the README, that I did. But EVERY OTHER PART of this mod was made with AI, using Claude, Chatgpt Codex, and Github Copilot.
 Uh, this may come a suprise to some people (if there are any downloading this mod) but it still works. I personally test every single version and have the ideas
-to implement them. Now, this isnt a promise, but I want to learn how to code myself, and 2.0.0 (unless stated so) will be the version which I code it. Hopefully 😭
-k byee.
+to implement them. Now, this isnt a promise, but I want to learn how to code myself, and 2.0.0 (unless stated so) will be the version which I code it. Hopefully. Have a wonderful day yall!
 ## License
 
 MIT Licence. See [LICENSE](LICENSE).
