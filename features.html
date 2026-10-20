@@ -28,43 +28,61 @@
       <section class="page-hero page-wrap">
         <p class="eyebrow"><span class="status-dot"></span> WHAT CHLORINE DOES</p>
         <h1>Small adjustments.<br><span>A more considered world.</span></h1>
-        <p>Chlorine focuses on CPU-side simulation, bursts of effects, and power use. It does not replace your renderer or change render distance.</p>
+          <p>Chlorine is a Fabric performance and power-management mod for Minecraft 26.3. It targets CPU-side simulation work, bursty entity effects, and laptop power usage while leaving chunk rendering and renderer internals to specialized mods.</p>
       </section>
 
       <section class="detail-list page-wrap">
         <article class="detail-row" id="adaptive">
           <span class="detail-index">01</span>
-          <div><p class="eyebrow">CLIENT TUNING</p><h2>Adapt to the moment.</h2></div>
+            <div><p class="eyebrow">Adapt to the moment.</p><h2>Adaptive client tuning</h2></div>
           <div class="detail-copy">
-            <p>The adaptive scaler watches a rolling FPS average, lowering simulation distance when performance dips and restoring it after a longer recovery cooldown. Optional fallbacks can adjust entity distance and particles.</p>
-            <p>A simulation-distance cap and fast-travel chunk governor give you more control. Chlorine changes simulation distance—not render distance—so it avoids rebuilding the chunk render graph.</p>
-          </div>
-        </article>
-        <article class="detail-row" id="world">
-          <span class="detail-index">02</span>
-          <div><p class="eyebrow">WORLD SIMULATION</p><h2>Ease background work.</h2></div>
-          <div class="detail-copy">
-            <p>Distant classic-mob and Brain-driven mob AI can be staggered when players are not nearby. Nearby mobs and physics are left alone.</p>
-            <p>Item and XP orb merging reduce the number of nearby entities. XP merging verifies value updates before discarding an orb and fails safe if it cannot.</p>
-          </div>
-        </article>
-        <article class="detail-row" id="comfort">
-          <span class="detail-index">03</span>
-          <div><p class="eyebrow">EFFECTS & POWER</p><h2>Make busy moments gentler.</h2></div>
-          <div class="detail-copy">
-            <p>Optional sound and particle budgets smooth bursts from farms, combat, fireworks, and other events. Quiet sounds, distant beacon beams, and portal particles can be pre-culled or throttled.</p>
-            <p>When Minecraft is unfocused or minimized, the power saver can cap FPS and hide clouds. Low-end auto-tune can apply lighter visual defaults once per launch.</p>
-          </div>
-        </article>
-        <article class="detail-row">
-          <span class="detail-index">04</span>
-          <div><p class="eyebrow">YOUR CONFIG</p><h2>Choose what stays on.</h2></div>
-          <div class="detail-copy">
-            <p>Features can be disabled individually. Configure them in-game with Cloth Config, optionally surfaced through Mod Menu, or edit <code>config/chlorine.json</code> directly.</p>
-            <p>Chlorine is designed to coexist with Sodium, Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris. Those mods are not required.</p>
-          </div>
-        </article>
-      </section>
+              <ul>
+                <li><strong>Adaptive simulation distance</strong> — monitors a rolling FPS average and lowers simulation distance when performance falls below the configured threshold, then raises it again after a recovery cooldown.</li>
+                <li><strong>Entity-distance scaling</strong> — can reduce the entity-distance multiplier after simulation distance reaches its configured floor.</li>
+                <li><strong>Particle fallback</strong> — can reduce the particle setting as a last resort.</li>
+                <li><strong>Simulation-distance cap</strong> — optionally prevents other tuning systems from raising simulation distance above a fixed ceiling.</li>
+                <li><strong>Fast-travel chunk governor</strong> — temporarily lowers simulation distance while moving quickly (Elytra, Riptide trident), then restores it after a cooldown.</li>
+              </ul>
+              <p>Chlorine intentionally changes <strong>simulation distance</strong>, not render distance. Render-distance changes can rebuild the entire chunk render graph and cause a large hitch; simulation distance instead targets server ticking, entity updates, random ticks, and block updates.</p>
+            </div>
+          </article>
+          <article class="detail-row" id="world">
+            <span class="detail-index">02</span>
+            <div><p class="eyebrow">Ease background work.</p><h2>Server and gameplay-side optimization</h2></div>
+            <div class="detail-copy">
+              <ul>
+                <li><strong>Distant classic-mob AI throttle</strong> — staggers goal-selector AI for mobs such as zombies and skeletons when no player is nearby. Physics and nearby mobs are not throttled.</li>
+                <li><strong>Distant Brain-mob throttle</strong> — applies the same idea directly to <code>Brain.tick()</code> for villagers, piglins, hoglins, allays, frogs, and other Brain-driven mobs.</li>
+                <li><strong>Item merging</strong> — periodically combines compatible nearby item entities around online players.</li>
+                <li><strong>XP orb merging</strong> — combines nearby experience orbs. Verifies the internal value update before discarding an orb and disables itself for the session if that operation cannot be verified.</li>
+                <li><strong>Server tick diagnostics</strong> — optionally logs a warning when average server tick time exceeds the configured threshold. Observability only; it does not alter server behavior.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="detail-row" id="comfort">
+            <span class="detail-index">03</span>
+            <div><p class="eyebrow">Make busy moments gentler.</p><h2>Client effects and power saving</h2></div>
+            <div class="detail-copy">
+              <ul>
+                <li><strong>Unfocused-window power saver</strong> — caps FPS while the game window is unfocused or minimized and can hide clouds during that period.</li>
+                <li><strong>Sound budget</strong> — limits how many new sounds may start in one client tick, smoothing bursts from farms, combat, or other events.</li>
+                <li><strong>Sound pre-cull</strong> — drops very quiet distance-attenuated sounds before they reach the audio engine.</li>
+                <li><strong>Particle budget</strong> — limits particle creation per client tick to smooth fireworks, explosions, potion clouds, and similar bursts.</li>
+                <li><strong>Beacon and portal throttles</strong> — skips distant beacon beams and Nether portal ambient particles when enabled.</li>
+                <li><strong>Low-end auto-tune</strong> — once per launch, detects constrained memory or CPU availability and applies lighter vanilla visual defaults.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="detail-row" id="config">
+            <span class="detail-index">04</span>
+            <div><p class="eyebrow">Choose what stays on.</p><h2>Your configuration</h2></div>
+            <div class="detail-copy">
+              <p>All features are independently configurable and can be disabled without removing the mod. Configure them in-game with Cloth Config, optionally surfaced through Mod Menu, or edit <code>config/chlorine.json</code> directly.</p>
+              <p>The in-game screen groups settings into: Simulation Distance Cap, Adaptive Scaler, Power Saver, Mob AI Throttle, Item Merging, XP Orb Merging, Sound Budget, Particle Budget, Low-End Auto-Tune, Beacon &amp; Portal Throttle, Chunk Gen Governor, Sound Pre-Cull, and Tick Diagnostics.</p>
+              <p>Chlorine is designed to coexist with Sodium, Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris — none of those mods is required.</p>
+            </div>
+          </article>
+        </section>
 
       <section class="callout page-wrap">
         <div><p class="eyebrow">A NOTE ON PERFORMANCE</p><h2>Results depend on your world.</h2></div>

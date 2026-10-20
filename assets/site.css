@@ -154,8 +154,11 @@ h1, h2, h3 { font-family: var(--display); }
 .detail-index { padding-top: 4px; color: var(--blue); font-family: var(--mono); font-size: 11px; }
 .detail-row .eyebrow { margin-bottom: 12px; }
 .detail-row h2 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -.05em; }
-.detail-copy p { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.8; }
-.detail-copy p:last-child { margin-bottom: 0; }
+.detail-copy p, .detail-copy li { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.detail-copy p:last-child, .detail-copy li:last-child { margin-bottom: 0; }
+.detail-copy ul { margin: 12px 0 0 18px; padding: 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.detail-copy li { margin-bottom: 8px; padding-left: 4px; }
+.detail-copy li strong { color: var(--text); }
 code { padding: 2px 5px; border-radius: 4px; background: #eaf0f8; color: #41526c; font-family: var(--mono); font-size: .9em; }
 .callout { display: flex; align-items: center; justify-content: space-between; gap: 50px; margin-bottom: 100px; padding: 36px 42px; border: 1px solid #dce8f7; border-radius: 14px; background: #eef5ff; }
 .callout .eyebrow { margin-bottom: 12px; }
