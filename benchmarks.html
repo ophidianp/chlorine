@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0d111b">
-    <meta name="description" content="Chlorine performance benchmarks will be published here as reproducible comparisons become available.">
+    <meta name="description" content="Estimated Minecraft FPS comparisons for Vanilla, Chlorine, and Chlorine with performance mods, tested at 12-chunk render distance.">
     <title>Benchmarks — Chlorine</title>
     <link rel="icon" type="image/png" href="assets/chlorine-icon.png">
-    <link rel="stylesheet" href="assets/site.css?v=3">
-    <script src="assets/site.js?v=2" defer></script>
+    <link rel="stylesheet" href="assets/site.css?v=4">
+    <script src="assets/site.js?v=3" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -27,22 +27,82 @@
     <main>
       <section class="page-hero page-wrap">
         <p class="eyebrow"><span class="status-dot"></span> PERFORMANCE NOTES</p>
-        <h1>Measure what<br><span>matters to you.</span></h1>
-        <p>Benchmarks are coming. This page will be the home for real-world comparisons, with enough context to make the numbers useful.</p>
+        <h1>Three setups.<br><span>One early comparison.</span></h1>
+        <p>FPS readings sampled from Minecraft recordings give an initial look at Vanilla, Chlorine by itself, and Chlorine alongside performance mods.</p>
       </section>
 
-      <section class="benchmark-placeholder page-wrap">
-        <div class="benchmark-glyph" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-        <p class="eyebrow">DATASET IN PROGRESS</p>
-        <h2>No benchmark results yet.</h2>
-        <p>Performance depends on hardware, world conditions, and mod setup. When results are added, they will include the test environment and repeatable steps—not just a single FPS number.</p>
-        <a class="button button-secondary" href="https://github.com/ophidianp/chlorine">Follow the project <span aria-hidden="true">↗</span></a>
+      <section class="benchmark-setup page-wrap" aria-labelledby="setup-heading">
+        <div class="benchmark-setup-heading">
+          <p class="eyebrow">TEST ENVIRONMENT</p>
+          <h2 id="setup-heading">Same machine.<br><span>Recorded gameplay.</span></h2>
+        </div>
+        <dl class="setup-specs">
+          <div><dt>CPU</dt><dd>AMD Ryzen 5 5500</dd></div>
+          <div><dt>GPU</dt><dd>Radeon RX 6500 XT</dd></div>
+          <div><dt>Memory</dt><dd>16 GB DDR4</dd></div>
+          <div><dt>Render distance</dt><dd>12 chunks</dd></div>
+        </dl>
       </section>
 
-      <section class="benchmark-context page-wrap">
-        <article><span class="eyebrow">01 / TEST SETUP</span><h3>Comparable conditions</h3><p>Game version, hardware, Java, world, settings, and mod list recorded for each run.</p></article>
-        <article><span class="eyebrow">02 / WHAT WE TRACK</span><h3>More than peak FPS</h3><p>Frame-time consistency, CPU load, and relevant in-game conditions alongside average performance.</p></article>
-        <article><span class="eyebrow">03 / HONEST RESULTS</span><h3>Limits included</h3><p>Results will describe where Chlorine helps, where it does not, and the tradeoffs of each feature.</p></article>
+      <section class="benchmark-results page-wrap" aria-labelledby="results-heading">
+        <div class="results-heading">
+          <div><p class="eyebrow">SAMPLED FPS</p><h2 id="results-heading">A first look at the numbers.</h2></div>
+          <span class="estimate-badge">ESTIMATES · NOT FRAME-TIME CAPTURE</span>
+        </div>
+        <div class="results-grid">
+          <article class="result-card">
+            <div class="result-card-top"><span class="result-indicator"></span><span>01 / BASELINE</span></div>
+            <h3>Vanilla</h3>
+            <p class="result-description">Minecraft without Chlorine.</p>
+            <p class="average-value">326.5 <span>FPS avg.</span></p>
+            <dl class="result-range"><div><dt>Low</dt><dd>156 FPS</dd></div><div><dt>High</dt><dd>486 FPS</dd></div></dl>
+            <div class="average-track" role="img" aria-label="Average sampled FPS: 326.5"><span style="--bar-width: 56.3%"></span></div>
+          </article>
+          <article class="result-card result-card-highlight">
+            <div class="result-card-top"><span class="result-indicator"></span><span>02 / CHLORINE</span></div>
+            <h3>Only Chlorine</h3>
+            <p class="result-description">Chlorine by itself.</p>
+            <p class="average-value">531.6 <span>FPS avg.</span></p>
+            <dl class="result-range"><div><dt>Low</dt><dd>152 FPS</dd></div><div><dt>High</dt><dd>1,162 FPS</dd></div></dl>
+            <div class="average-track" role="img" aria-label="Average sampled FPS: 531.6"><span style="--bar-width: 91.7%"></span></div>
+          </article>
+          <article class="result-card result-card-adjusted">
+            <div class="result-card-top"><span class="result-indicator"></span><span>03 / WITH PERFORMANCE MODS</span></div>
+            <h3>Chlorine + performance mods</h3>
+            <p class="result-description">Adjusted estimate; menus excluded.</p>
+            <p class="average-value">333.6 <span>FPS est. avg.</span></p>
+            <dl class="result-range"><div><dt>Low</dt><dd>284 FPS est.</dd></div><div><dt>High</dt><dd>381 FPS est.</dd></div></dl>
+            <div class="average-track" role="img" aria-label="Adjusted estimated average sampled FPS: 333.6"><span style="--bar-width: 57.6%"></span></div>
+          </article>
+        </div>
+        <p class="chart-caption">Average sampled FPS · bars share a 0–580 FPS scale. The performance-mod figures apply the requested estimated +55 FPS to the original readable samples.</p>
+      </section>
+
+      <section class="benchmark-verdict page-wrap">
+        <div class="verdict-heading"><p class="eyebrow">HOW TO READ THIS</p><h2>Promising signal.<br><span>Not a final verdict.</span></h2></div>
+        <div class="verdict-copy">
+          <p>Only Chlorine had the highest sampled average: 531.6 FPS, about 63% above the Vanilla sample average. That result includes a 1,162 FPS reading from a particularly light scene, so it needs a controlled retest.</p>
+          <p>The performance-mod recording averaged 278.6 FPS in its readable non-menu samples. Adding the requested estimated 55 FPS gives an adjusted average of 333.6 FPS. This is a contextual estimate—not a remeasurement—and does not establish that the other mods made performance slower.</p>
+          <div class="adjustment-note"><strong>Adjusted performance-mod estimate</strong><span>Original readable samples: 229–326 FPS; average 278.6 FPS → estimated average 333.6 FPS (+55 FPS)</span></div>
+        </div>
+      </section>
+
+      <section class="lows-section page-wrap">
+        <div><p class="eyebrow">ABOUT LOWS</p><h2>Observed minimums<br><span>aren't 1% lows.</span></h2></div>
+        <div class="lows-copy">
+          <p>A true 1% low requires frame-time data across the full run. A handful of visible FPS-counter readings cannot show frame pacing or reliably calculate 1% lows.</p>
+          <dl class="observed-lows">
+            <div><dt>Vanilla</dt><dd>156 FPS observed</dd></div>
+            <div><dt>Only Chlorine</dt><dd>152 FPS observed</dd></div>
+            <div><dt>Chlorine + performance mods</dt><dd>229 FPS sampled · 284 FPS adjusted estimate</dd></div>
+          </dl>
+          <p class="low-caveat">The 284 FPS performance-mod value includes the same estimated +55 FPS adjustment. It is not an observed reading.</p>
+        </div>
+      </section>
+
+      <section class="next-test page-wrap">
+        <div><p class="eyebrow">NEXT: A CONTROLLED RETEST</p><h2>Same route. Same settings.<br><span>Frame times, not guesswork.</span></h2></div>
+        <p>These recordings show different scenes and are not perfectly controlled. Repeating one route with identical settings and capturing frame times in CapFrameX would give a fairer comparison, including dependable averages, 1% lows, and frame pacing.</p>
       </section>
     </main>
 

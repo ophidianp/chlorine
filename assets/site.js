@@ -41,7 +41,7 @@ if (menuToggle && siteNav) {
 }
 
 const revealElements = document.querySelectorAll(
-  ".section, .feature-card, .work-heading, .work-item, .flow-heading, .flow-grid article, .compat-copy, .compat-panel, .faq-heading, .faq-list, .download-band, .detail-row, .callout, .release-panel, .install-steps article, .benchmark-placeholder, .benchmark-context article",
+  ".section, .feature-card, .work-heading, .work-item, .flow-heading, .flow-grid article, .compat-copy, .compat-panel, .faq-heading, .faq-list, .download-band, .detail-row, .callout, .release-panel, .install-steps article, .benchmark-placeholder, .benchmark-context article, .benchmark-setup, .result-card, .benchmark-verdict, .lows-section, .next-test",
 );
 
 if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
