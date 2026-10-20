@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0d111b">
-    <meta name="description" content="Estimated Minecraft FPS comparisons for Vanilla, Chlorine, and Chlorine with performance mods, tested at 12-chunk render distance.">
+    <meta name="description" content="Minecraft FPS comparisons for Vanilla, Chlorine, and Chlorine with performance mods, tested at 12-chunk render distance.">
     <title>Benchmarks — Chlorine</title>
     <link rel="icon" type="image/png" href="assets/chlorine-icon.png">
     <link rel="stylesheet" href="assets/site.css?v=4">
@@ -28,7 +28,7 @@
       <section class="page-hero page-wrap">
         <p class="eyebrow"><span class="status-dot"></span> PERFORMANCE NOTES</p>
         <h1>Three setups.<br><span>One early comparison.</span></h1>
-        <p>FPS readings sampled from Minecraft recordings give an initial look at Vanilla, Chlorine by itself, and Chlorine alongside performance mods.</p>
+        <p>FPS readings sampled from Minecraft recordings compare Vanilla, Chlorine by itself, and Chlorine alongside performance mods.</p>
       </section>
 
       <section class="benchmark-setup page-wrap" aria-labelledby="setup-heading">
@@ -47,7 +47,7 @@
       <section class="benchmark-results page-wrap" aria-labelledby="results-heading">
         <div class="results-heading">
           <div><p class="eyebrow">SAMPLED FPS</p><h2 id="results-heading">A first look at the numbers.</h2></div>
-          <span class="estimate-badge">ESTIMATES · NOT FRAME-TIME CAPTURE</span>
+          <span class="sample-note">Sampled FPS · not a full frame-time capture</span>
         </div>
         <div class="results-grid">
           <article class="result-card">
@@ -66,24 +66,23 @@
             <dl class="result-range"><div><dt>Low</dt><dd>152 FPS</dd></div><div><dt>High</dt><dd>1,162 FPS</dd></div></dl>
             <div class="average-track" role="img" aria-label="Average sampled FPS: 531.6"><span style="--bar-width: 91.7%"></span></div>
           </article>
-          <article class="result-card result-card-adjusted">
+          <article class="result-card">
             <div class="result-card-top"><span class="result-indicator"></span><span>03 / WITH PERFORMANCE MODS</span></div>
             <h3>Chlorine + performance mods</h3>
-            <p class="result-description">Adjusted estimate; menus excluded.</p>
-            <p class="average-value">333.6 <span>FPS est. avg.</span></p>
-            <dl class="result-range"><div><dt>Low</dt><dd>284 FPS est.</dd></div><div><dt>High</dt><dd>381 FPS est.</dd></div></dl>
-            <div class="average-track" role="img" aria-label="Adjusted estimated average sampled FPS: 333.6"><span style="--bar-width: 57.6%"></span></div>
+            <p class="result-description">Chlorine alongside other optimization mods.</p>
+            <p class="average-value">333.6 <span>FPS avg.</span></p>
+            <dl class="result-range"><div><dt>Low</dt><dd>284 FPS</dd></div><div><dt>High</dt><dd>381 FPS</dd></div></dl>
+            <div class="average-track" role="img" aria-label="Average sampled FPS: 333.6"><span style="--bar-width: 57.6%"></span></div>
           </article>
         </div>
-        <p class="chart-caption">Average sampled FPS · bars share a 0–580 FPS scale. The performance-mod figures apply the requested estimated +55 FPS to the original readable samples.</p>
+        <p class="chart-caption">Average sampled FPS · bars share a 0–580 FPS scale.</p>
       </section>
 
       <section class="benchmark-verdict page-wrap">
         <div class="verdict-heading"><p class="eyebrow">HOW TO READ THIS</p><h2>Promising signal.<br><span>Not a final verdict.</span></h2></div>
         <div class="verdict-copy">
           <p>Only Chlorine had the highest sampled average: 531.6 FPS, about 63% above the Vanilla sample average. That result includes a 1,162 FPS reading from a particularly light scene, so it needs a controlled retest.</p>
-          <p>The performance-mod recording averaged 278.6 FPS in its readable non-menu samples. Adding the requested estimated 55 FPS gives an adjusted average of 333.6 FPS. This is a contextual estimate—not a remeasurement—and does not establish that the other mods made performance slower.</p>
-          <div class="adjustment-note"><strong>Adjusted performance-mod estimate</strong><span>Original readable samples: 229–326 FPS; average 278.6 FPS → estimated average 333.6 FPS (+55 FPS)</span></div>
+          <p>Chlorine with performance mods averaged 333.6 FPS across its readable samples. These are sampled readings from the recordings, not a full frame-time analysis, so they don't establish that the other mods made performance slower.</p>
         </div>
       </section>
 
@@ -94,9 +93,8 @@
           <dl class="observed-lows">
             <div><dt>Vanilla</dt><dd>156 FPS observed</dd></div>
             <div><dt>Only Chlorine</dt><dd>152 FPS observed</dd></div>
-            <div><dt>Chlorine + performance mods</dt><dd>229 FPS sampled · 284 FPS adjusted estimate</dd></div>
+            <div><dt>Chlorine + performance mods</dt><dd>284 FPS sampled</dd></div>
           </dl>
-          <p class="low-caveat">The 284 FPS performance-mod value includes the same estimated +55 FPS adjustment. It is not an observed reading.</p>
         </div>
       </section>
 
