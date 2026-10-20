@@ -146,6 +146,14 @@ The GitHub Actions workflow in `.github/workflows/build.yml` builds with
 Temurin Java 25 and Gradle 9.5.1, then uploads the jars as workflow
 artifacts.
 
+## Website
+
+The static project website lives in [`chlorine-website/`](chlorine-website/).
+Its GitHub Pages deployment workflow publishes changes merged to `main`;
+configure the repository's Pages source as **GitHub Actions** to enable
+deployment. The download selector reads published release assets from the
+GitHub Releases API, so new releases appear without a manual website update.
+
 ## Project structure
 
 ```text
