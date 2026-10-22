@@ -8,6 +8,8 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.phys.AABB;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 /**
@@ -62,12 +64,18 @@ public final class XpOrbMerger {
         double mergeDistSq = Chlorine.CONFIG.xpMergeRadius * Chlorine.CONFIG.xpMergeRadius;
 
         for (ServerLevel level : server.getAllLevels()) {
+            IdentityHashMap<ExperienceOrb, Boolean> seen = new IdentityHashMap<>();
+            List<ExperienceOrb> nearbyOrbs = new ArrayList<>();
             for (ServerPlayer player : level.players()) {
                 AABB box = player.getBoundingBox().inflate(scanRadius);
-                List<ExperienceOrb> orbs = level.getEntitiesOfClass(ExperienceOrb.class, box);
-                if (!mergeCluster(orbs, mergeDistSq)) {
-                    return; // disabled itself mid-pass, stop immediately
+                for (ExperienceOrb orb : level.getEntitiesOfClass(ExperienceOrb.class, box)) {
+                    if (seen.put(orb, Boolean.TRUE) == null) {
+                        nearbyOrbs.add(orb);
+                    }
                 }
+            }
+            if (!nearbyOrbs.isEmpty() && !mergeCluster(nearbyOrbs, mergeDistSq)) {
+                return; // disabled itself mid-pass, stop immediately
             }
         }
     }

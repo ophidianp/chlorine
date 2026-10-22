@@ -8,6 +8,8 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 /**
@@ -67,10 +69,18 @@ public final class ItemMerger {
         double mergeDistSq = Chlorine.CONFIG.itemMergeRadius * Chlorine.CONFIG.itemMergeRadius;
 
         for (ServerLevel level : server.getAllLevels()) {
+            IdentityHashMap<ItemEntity, Boolean> seen = new IdentityHashMap<>();
+            List<ItemEntity> nearbyItems = new ArrayList<>();
             for (ServerPlayer player : level.players()) {
                 AABB box = player.getBoundingBox().inflate(scanRadius);
-                List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, box);
-                mergeCluster(items, mergeDistSq);
+                for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, box)) {
+                    if (seen.put(item, Boolean.TRUE) == null) {
+                        nearbyItems.add(item);
+                    }
+                }
+            }
+            if (!nearbyItems.isEmpty()) {
+                mergeCluster(nearbyItems, mergeDistSq);
             }
         }
     }
