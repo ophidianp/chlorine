@@ -9,6 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Periodically merges nearby stackable item entities near each player.
@@ -45,6 +47,8 @@ import java.util.List;
  */
 public final class ItemMerger {
     private int ticksUntilNextPass = 0;
+    private final Deque<ServerPlayer> pendingPlayers = new ArrayDeque<>();
+    private MergeWork pendingWork;
 
     private ItemMerger() {
     }
@@ -58,27 +62,60 @@ public final class ItemMerger {
         if (!Chlorine.CONFIG.enableItemMerging) {
             return;
         }
-        if (--ticksUntilNextPass > 0) {
+        if (pendingPlayers.isEmpty() && pendingWork == null && --ticksUntilNextPass > 0) {
             return;
         }
-        ticksUntilNextPass = Math.max(20, Chlorine.CONFIG.itemMergeIntervalTicks);
 
         double scanRadius = Chlorine.CONFIG.itemMergeScanRadius;
         double mergeDistSq = Chlorine.CONFIG.itemMergeRadius * Chlorine.CONFIG.itemMergeRadius;
+        if (pendingPlayers.isEmpty() && pendingWork == null) {
+            for (ServerLevel level : server.getAllLevels()) {
+                pendingPlayers.addAll(level.players());
+            }
+        }
 
-        for (ServerLevel level : server.getAllLevels()) {
-            for (ServerPlayer player : level.players()) {
+        long deadline = System.nanoTime()
+                + (long) (Math.max(0.1, Chlorine.CONFIG.itemMergeBudgetMillis) * 1_000_000.0);
+        while (System.nanoTime() < deadline) {
+            if (pendingWork != null) {
+                if (!pendingWork.process(deadline)) {
+                    break;
+                }
+                pendingWork = null;
+                continue;
+            }
+            ServerPlayer player = pendingPlayers.pollFirst();
+            if (player == null) {
+                ticksUntilNextPass = Math.max(20, Chlorine.CONFIG.itemMergeIntervalTicks);
+                return;
+            }
+                if (player.isRemoved() || !(player.level() instanceof ServerLevel level)) {
+                continue;
+            }
                 AABB box = player.getBoundingBox().inflate(scanRadius);
                 List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, box);
-                mergeCluster(items, mergeDistSq);
-            }
+            pendingWork = new MergeWork(items, mergeDistSq);
         }
     }
 
-    private void mergeCluster(List<ItemEntity> items, double mergeDistSq) {
-        EntitySpatialIndex<ItemEntity> spatialIndex = new EntitySpatialIndex<>(items, Math.sqrt(mergeDistSq));
-        for (int i = 0; i < items.size(); i++) {
-            ItemEntity a = items.get(i);
+    private static final class MergeWork {
+        private final List<ItemEntity> items;
+        private final EntitySpatialIndex<ItemEntity> spatialIndex;
+        private final double mergeDistSq;
+        private int index;
+
+        private MergeWork(List<ItemEntity> items, double mergeDistSq) {
+            this.items = items;
+            this.mergeDistSq = mergeDistSq;
+            this.spatialIndex = new EntitySpatialIndex<>(items, Math.sqrt(mergeDistSq));
+        }
+
+        private boolean process(long deadline) {
+        for (; index < items.size(); index++) {
+            if (System.nanoTime() >= deadline) {
+                return false;
+            }
+            ItemEntity a = items.get(index);
             if (!a.isAlive()) {
                 spatialIndex.remove(a);
                 continue;
@@ -88,7 +125,10 @@ public final class ItemMerger {
                 continue;
             }
 
-            for (ItemEntity b : spatialIndex.nearbyAfter(i)) {
+            for (ItemEntity b : spatialIndex.nearbyAfter(index)) {
+                if (System.nanoTime() >= deadline) {
+                    return false;
+                }
                 if (!b.isAlive()) {
                     spatialIndex.remove(b);
                     continue;
@@ -136,6 +176,8 @@ public final class ItemMerger {
                     Chlorine.LOGGER.warn("Chlorine: item merge shrink had no effect, skipping discard to avoid item loss");
                 }
             }
+        }
+        return true;
         }
     }
 }

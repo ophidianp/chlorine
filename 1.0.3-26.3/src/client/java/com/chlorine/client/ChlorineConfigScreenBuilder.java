@@ -148,6 +148,12 @@ public final class ChlorineConfigScreenBuilder {
                 .setMin(0.5)
                 .setSaveConsumer(v -> cfg.itemMergeRadius = v)
                 .build());
+        items.addEntry(eb.startDoubleField(Component.literal("Per-tick work budget (ms)"), cfg.itemMergeBudgetMillis)
+                .setMin(0.1)
+                .setMax(20.0)
+                .setTooltip(Component.literal("Caps merge work per server tick to protect 1% and 0.1% lows."))
+                .setSaveConsumer(v -> cfg.itemMergeBudgetMillis = v)
+                .build());
 
         ConfigCategory xp = builder.getOrCreateCategory(Component.literal("XP Orb Merging"));
         xp.addEntry(eb.startBooleanToggle(Component.literal("Enable XP orb merging"), cfg.enableXpOrbMerging)
@@ -166,6 +172,12 @@ public final class ChlorineConfigScreenBuilder {
                 .setMin(0.5)
                 .setSaveConsumer(v -> cfg.xpMergeRadius = v)
                 .build());
+        xp.addEntry(eb.startDoubleField(Component.literal("Per-tick work budget (ms)"), cfg.xpMergeBudgetMillis)
+                .setMin(0.1)
+                .setMax(20.0)
+                .setTooltip(Component.literal("Caps orb merge work per server tick to protect 1% and 0.1% lows."))
+                .setSaveConsumer(v -> cfg.xpMergeBudgetMillis = v)
+                .build());
 
         ConfigCategory sound = builder.getOrCreateCategory(Component.literal("Sound Budget"));
         sound.addEntry(eb.startBooleanToggle(Component.literal("Enable sound budget"), cfg.enableSoundBudget)
@@ -174,6 +186,15 @@ public final class ChlorineConfigScreenBuilder {
                 .build());
         sound.addEntry(eb.startIntSlider(Component.literal("Max new sounds per tick"), cfg.maxNewSoundsPerTick, 1, 64)
                 .setSaveConsumer(v -> cfg.maxNewSoundsPerTick = v)
+                .build());
+        sound.addEntry(eb.startDoubleField(Component.literal("Low-FPS budget scale"), cfg.lowFpsEffectBudgetScale)
+                .setMin(0.1)
+                .setMax(1.0)
+                .setTooltip(Component.literal("Scales the sound and particle budgets while FPS is below the adaptive threshold."))
+                .setSaveConsumer(v -> cfg.lowFpsEffectBudgetScale = v)
+                .build());
+        sound.addEntry(eb.startIntSlider(Component.literal("Adaptive low-FPS threshold"), cfg.effectBudgetLowFpsThreshold, 10, 120)
+                .setSaveConsumer(v -> cfg.effectBudgetLowFpsThreshold = v)
                 .build());
 
         ConfigCategory particles = builder.getOrCreateCategory(Component.literal("Particle Budget"));

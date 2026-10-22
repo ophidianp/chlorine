@@ -70,13 +70,13 @@ removing the mod.
 - Java **25 or newer**
 - [Cloth Config API](https://modrinth.com/mod/cloth-config) (required)
 
-[Sodium 0.9.2 or newer](https://modrinth.com/mod/sodium) (temporarily
-required for the 1.0.3 Sodium integration build)
+[Sodium 0.9.2 or newer](https://modrinth.com/mod/sodium) (required)
 
 [Mod Menu](https://modrinth.com/mod/modmenu) is optional. When installed, it
 adds Chlorine's **Config** button to the mod list. Chlorine is designed to
-coexist with Sodium, Lithium, FerriteCore, EntityCulling, ImmediatelyFast,
-and Iris; none of those mods is required.
+Chlorine 1.0.3 requires Sodium because its client workload governors integrate
+directly with Sodium's renderer. Lithium, FerriteCore, EntityCulling,
+ImmediatelyFast, and Iris remain optional.
 
 ## Installation
 
@@ -110,6 +110,8 @@ The in-game screen groups settings into:
 - Chunk Gen Governor
 - Sound Pre-Cull
 - Sodium Workload Governors
+- Time-Budgeted Merge Work
+- Adaptive Effect Budgets
 - Tick Diagnostics
 
 Important interactions:
@@ -122,6 +124,12 @@ Important interactions:
   camera-stable culling pressure, worker-queue pressure reduction, and
   dynamic terrain workload scaling. They all use Sodium's existing queued
   render path; Chlorine does not replace Sodium's culler or worker pool.
+- Item and XP-orb merge passes use small per-tick wall-clock budgets and
+  resume where they stopped. Dense farms therefore cannot turn one merge pass
+  into a large server-tick or frame-time spike.
+- Sound and particle burst budgets automatically tighten while FPS is low and
+  return to their configured limits when performance recovers. Effects are
+  dropped rather than queued, so the feature cannot create delayed burst work.
 - Lowering AI throttle intervals improves responsiveness but reduces the
   possible CPU savings. Start with the defaults and adjust gradually.
 

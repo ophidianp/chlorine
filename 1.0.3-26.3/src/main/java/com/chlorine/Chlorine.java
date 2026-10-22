@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Chlorine — a laptop-friendly performance mod for Fabric 26.2.
+ * Chlorine — a laptop-friendly performance mod for Fabric 26.3.
  *
  * Chlorine is designed to sit *alongside* the usual performance stack
  * (Sodium, Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris)
@@ -21,8 +21,9 @@ import org.slf4j.LoggerFactory;
  *     (see MobAiThrottleMixin), similar in spirit to what Lithium does
  *     for tick logic, scoped narrowly so it won't fight with it
  *
- * None of this requires Sodium/Iris/etc. to be installed — Chlorine works
- * standalone too — but it's written to complement them, not replace them.
+ * The 26.3 release requires Sodium for its renderer integration. Other
+ * performance mods remain optional, and Chlorine complements rather than
+ * replaces their systems.
  */
 public class Chlorine implements ModInitializer {
     public static final String MOD_ID = "chlorine";

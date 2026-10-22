@@ -42,6 +42,15 @@ public class ChlorineClient implements ClientModInitializer {
             if (client.level != null) {
                 SimulationDistanceSync.publish(client.options.simulationDistance().get());
             }
+            if (Chlorine.CONFIG.enableSoundBudget || Chlorine.CONFIG.enableParticleBudget) {
+                ClientEffectBudgets.update(
+                        client.getFps(),
+                        Chlorine.CONFIG.maxNewSoundsPerTick,
+                        Chlorine.CONFIG.maxNewParticlesPerTick,
+                        Chlorine.CONFIG.effectBudgetLowFpsThreshold,
+                        Chlorine.CONFIG.lowFpsEffectBudgetScale
+                );
+            }
             // Reset at the end of each tick so the next tick's sound and
             // particle budgets start clean.
             ClientEffectBudgets.reset();

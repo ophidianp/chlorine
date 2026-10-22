@@ -115,6 +115,8 @@ public class ChlorineConfig {
     public double itemMergeScanRadius = 48.0;
     /** Items within this many blocks of each other get merged. */
     public double itemMergeRadius = 2.0;
+    /** Maximum wall-clock time spent merging items in one server tick. */
+    public double itemMergeBudgetMillis = 1.5;
 
     // --- XP orb merging (server/common) ---
     // Same idea as item merging, applied to ExperienceOrb — grinders and
@@ -130,6 +132,8 @@ public class ChlorineConfig {
     public double xpMergeScanRadius = 48.0;
     /** Orbs within this many blocks of each other get merged. */
     public double xpMergeRadius = 2.0;
+    /** Maximum wall-clock time spent merging XP orbs in one server tick. */
+    public double xpMergeBudgetMillis = 1.0;
 
     // --- Sound instance budget (client) ---
     // Not distance-based — vanilla already attenuates/culls inaudible
@@ -140,6 +144,8 @@ public class ChlorineConfig {
     public boolean enableSoundBudget = true;
     /** Max new sounds allowed to start per client tick. */
     public int maxNewSoundsPerTick = 8;
+    /** Reduce burst budgets by this factor when FPS is below the low-FPS threshold. */
+    public double lowFpsEffectBudgetScale = 0.5;
 
     // --- Particle spawn budget (client) ---
     // Same shape as the sound budget, same reasoning: not distance-based
@@ -151,6 +157,8 @@ public class ChlorineConfig {
     public boolean enableParticleBudget = true;
     /** Max new particles allowed to spawn per client tick. */
     public int maxNewParticlesPerTick = 200;
+    /** FPS below which adaptive sound/particle budgets use their reduced scale. */
+    public int effectBudgetLowFpsThreshold = 35;
 
     // --- Low-end auto-tune (client, applied once on startup) ---
     // A few vanilla visual options are meaningfully expensive and safe to

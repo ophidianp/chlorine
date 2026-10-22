@@ -8,6 +8,8 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.phys.AABB;
 
 import java.lang.reflect.Field;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -40,6 +42,8 @@ public final class XpOrbMerger {
     private static boolean disabled = false;
 
     private int ticksUntilNextPass = 0;
+    private final Deque<ServerPlayer> pendingPlayers = new ArrayDeque<>();
+    private MergeWork pendingWork;
 
     private XpOrbMerger() {
     }
@@ -53,36 +57,69 @@ public final class XpOrbMerger {
         if (!Chlorine.CONFIG.enableXpOrbMerging || disabled) {
             return;
         }
-        if (--ticksUntilNextPass > 0) {
+        if (pendingPlayers.isEmpty() && pendingWork == null && --ticksUntilNextPass > 0) {
             return;
         }
-        ticksUntilNextPass = Math.max(20, Chlorine.CONFIG.xpMergeIntervalTicks);
 
         double scanRadius = Chlorine.CONFIG.xpMergeScanRadius;
         double mergeDistSq = Chlorine.CONFIG.xpMergeRadius * Chlorine.CONFIG.xpMergeRadius;
+        if (pendingPlayers.isEmpty() && pendingWork == null) {
+            for (ServerLevel level : server.getAllLevels()) {
+                pendingPlayers.addAll(level.players());
+            }
+        }
 
-        for (ServerLevel level : server.getAllLevels()) {
-            for (ServerPlayer player : level.players()) {
+        long deadline = System.nanoTime()
+                + (long) (Math.max(0.1, Chlorine.CONFIG.xpMergeBudgetMillis) * 1_000_000.0);
+        while (System.nanoTime() < deadline) {
+            if (pendingWork != null) {
+                if (!pendingWork.process(deadline)) {
+                    break;
+                }
+                pendingWork = null;
+                continue;
+            }
+            ServerPlayer player = pendingPlayers.pollFirst();
+            if (player == null) {
+                ticksUntilNextPass = Math.max(20, Chlorine.CONFIG.xpMergeIntervalTicks);
+                return;
+            }
+                if (player.isRemoved() || !(player.level() instanceof ServerLevel level)) {
+                continue;
+            }
                 AABB box = player.getBoundingBox().inflate(scanRadius);
                 List<ExperienceOrb> orbs = level.getEntitiesOfClass(ExperienceOrb.class, box);
-                if (!mergeCluster(orbs, mergeDistSq)) {
-                    return; // disabled itself mid-pass, stop immediately
-                }
-            }
+            pendingWork = new MergeWork(orbs, mergeDistSq);
         }
     }
 
-    /** Returns false if merging had to disable itself during this pass. */
-    private boolean mergeCluster(List<ExperienceOrb> orbs, double mergeDistSq) {
-        EntitySpatialIndex<ExperienceOrb> spatialIndex = new EntitySpatialIndex<>(orbs, Math.sqrt(mergeDistSq));
-        for (int i = 0; i < orbs.size(); i++) {
-            ExperienceOrb a = orbs.get(i);
+    private final class MergeWork {
+        private final List<ExperienceOrb> orbs;
+        private final EntitySpatialIndex<ExperienceOrb> spatialIndex;
+        private final double mergeDistSq;
+        private int index;
+
+        private MergeWork(List<ExperienceOrb> orbs, double mergeDistSq) {
+            this.orbs = orbs;
+            this.mergeDistSq = mergeDistSq;
+            this.spatialIndex = new EntitySpatialIndex<>(orbs, Math.sqrt(mergeDistSq));
+        }
+
+        private boolean process(long deadline) {
+        for (; index < orbs.size(); index++) {
+            if (System.nanoTime() >= deadline) {
+                return false;
+            }
+            ExperienceOrb a = orbs.get(index);
             if (!a.isAlive()) {
                 spatialIndex.remove(a);
                 continue;
             }
 
-            for (ExperienceOrb b : spatialIndex.nearbyAfter(i)) {
+            for (ExperienceOrb b : spatialIndex.nearbyAfter(index)) {
+                if (System.nanoTime() >= deadline) {
+                    return false;
+                }
                 if (!b.isAlive()) {
                     spatialIndex.remove(b);
                     continue;
@@ -106,6 +143,7 @@ public final class XpOrbMerger {
             }
         }
         return true;
+        }
     }
 
     private static void disableSelf(String reason) {
