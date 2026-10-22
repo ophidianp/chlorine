@@ -87,10 +87,6 @@ public class ChlorineConfig {
     public double aiActiveRadius = 48.0;
     /** Beyond that radius, only run the AI goal selector every Nth tick. */
     public int aiThrottleInterval = 8;
-    /** Also throttle server-side navigation/path-following for distant mobs. */
-    public boolean enableDistantMobNavigationThrottle = false;
-    /** Beyond aiActiveRadius, run distant mob navigation every Nth tick. */
-    public int navigationThrottleInterval = 4;
 
     // --- Distant Brain-based mob throttle (server/common) ---
     // Villagers, piglins, hoglins, allays, frogs, and other Brain-driven
@@ -134,6 +130,14 @@ public class ChlorineConfig {
     public double xpMergeScanRadius = 48.0;
     /** Orbs within this many blocks of each other get merged. */
     public double xpMergeRadius = 2.0;
+
+    // --- Hopper idle backoff (server/common) ---
+    // Hoppers already use a transfer cooldown, but loaded hoppers still
+    // execute their server tick path between transfer attempts. This option
+    // adds a conservative backoff for hoppers far from every player.
+    public boolean enableDistantHopperBackoff = false;
+    /** Hoppers outside the active player radius run their transfer check every Nth tick. */
+    public int hopperBackoffInterval = 4;
 
     // --- Sound instance budget (client) ---
     // Not distance-based — vanilla already attenuates/culls inaudible

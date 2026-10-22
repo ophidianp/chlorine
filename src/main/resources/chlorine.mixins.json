@@ -4,8 +4,8 @@
   "package": "com.chlorine.mixin",
   "mixins": [
     "MobAiThrottleMixin",
-    "MobNavigationThrottleMixin",
-    "BrainTickThrottleMixin"
+    "BrainTickThrottleMixin",
+    "HopperBackoffMixin"
   ],
   "client": [
     "client.SoundBudgetMixin",
