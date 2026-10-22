@@ -14,7 +14,7 @@ let publishedReleases = [];
 let selectedVersion = new URLSearchParams(window.location.search).get("version") === "26.2" ? "26.2" : "26.3";
 
 function gameVersion(release) {
-  const releaseText = `${release.name || ""} ${release.tag_name || ""} ${release.body || ""}`;
+  const releaseText = `${release.name || ""} ${release.tag_name || ""}`;
   return releaseText.match(/Minecraft\s*[:\-]?\s*(26\.[23])\b/i)?.[1] || null;
 }
 
