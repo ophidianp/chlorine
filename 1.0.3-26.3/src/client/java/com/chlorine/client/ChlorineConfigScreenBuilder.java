@@ -299,6 +299,17 @@ public final class ChlorineConfigScreenBuilder {
                 .setMax(4.0)
                 .setSaveConsumer(v -> cfg.sodiumCullingMovementThreshold = v)
                 .build());
+        sodium.addEntry(eb.startIntField(Component.literal("Builder queue pressure threshold"), cfg.sodiumBuilderQueueThreshold)
+                .setMin(1)
+                .setSaveConsumer(v -> cfg.sodiumBuilderQueueThreshold = v)
+                .build());
+        sodium.addEntry(eb.startIntField(Component.literal("Pressure hysteresis (ticks)"), cfg.sodiumPressureHysteresisTicks)
+                .setMin(2)
+                .setSaveConsumer(v -> cfg.sodiumPressureHysteresisTicks = v)
+                .build());
+        sodium.addEntry(eb.startIntSlider(Component.literal("Recovery FPS"), cfg.sodiumRecoveryFps, 10, 120)
+                .setSaveConsumer(v -> cfg.sodiumRecoveryFps = v)
+                .build());
         sodium.addEntry(eb.startBooleanToggle(Component.literal("Apply Sodium GPU profile"), cfg.enableSodiumGpuProfile)
                 .setTooltip(Component.literal("Enables Sodium fog occlusion, block-face culling, and visible-texture animation optimizations at startup."))
                 .setSaveConsumer(v -> cfg.enableSodiumGpuProfile = v)

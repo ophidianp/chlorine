@@ -121,10 +121,13 @@ Important interactions:
   on the client simulation-distance option.
 - Chlorine lowers the client simulation-distance minimum to 1 chunk, including
   in Sodium's settings screen when Sodium is installed.
-- Sodium 1.0.3 uses four coordinated governors: adaptive rebuild scheduling,
-  camera-stable culling pressure, worker-queue pressure reduction, and
-  dynamic terrain workload scaling. They all use Sodium's existing queued
-  render path; Chlorine does not replace Sodium's culler or worker pool.
+- Sodium 1.0.3's workload governor samples Sodium's public builder counters at
+  `RenderSectionManager.finalizeRenderLists(...)`. It defers the immediate
+  update request only after a sustained low-FPS window, a real queued-job
+  backlog, and a stable camera all agree that synchronous work is contributing
+  to pressure. Hysteresis prevents rapid toggling, and moving cameras retain
+  Sodium's normal path. Chlorine does not replace Sodium's culler, builder, or
+  worker pool.
 - The Sodium GPU profile enables Sodium's exposed fog-occlusion, block-face
   culling, and visible-texture animation settings. It does not replace
   Sodium's OpenGL renderer or attempt the GPU entity-transform work tracked

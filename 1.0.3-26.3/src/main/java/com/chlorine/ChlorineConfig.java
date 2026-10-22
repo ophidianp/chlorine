@@ -231,6 +231,12 @@ public class ChlorineConfig {
     public int sodiumWorkloadWindowTicks = 30;
     /** Minimum camera movement in blocks before a culling result is considered stale. */
     public double sodiumCullingMovementThreshold = 0.25;
+    /** Queued Sodium chunk jobs required before the workload governor can defer immediate work. */
+    public int sodiumBuilderQueueThreshold = 8;
+    /** Consecutive ticks required to enter or leave pressure mode. */
+    public int sodiumPressureHysteresisTicks = 20;
+    /** FPS recovery target used to leave pressure mode early. */
+    public int sodiumRecoveryFps = 45;
     /** Apply Sodium's GPU-oriented culling and animation settings on startup. */
     public boolean enableSodiumGpuProfile = true;
 
