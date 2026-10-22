@@ -209,6 +209,14 @@ public class ChlorineConfig {
      *  this fraction (0.0–1.0) are dropped before reaching OpenAL. */
     public double soundPreCullVolumeThreshold = 0.05;
 
+    // --- Font text-width cache (client) ---
+    // Repeated HUD and GUI labels often ask the font renderer for the same
+    // string width every frame. Cache only plain strings with a bounded,
+    // per-font cache so dynamic text cannot grow memory without limit.
+    public boolean enableFontWidthCache = true;
+    /** Maximum cached plain-string widths per Font instance. */
+    public int fontWidthCacheSize = 2048;
+
     // --- Server tick-health diagnostics (server/common) ---
     // Pure observability, no behavior change: periodically logs a warning
     // if average server tick time creeps above a threshold, so slowdowns

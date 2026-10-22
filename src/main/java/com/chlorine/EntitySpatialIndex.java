@@ -5,11 +5,9 @@ import net.minecraft.world.entity.Entity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Indexes entities by position so merge passes only compare candidates in
@@ -18,7 +16,7 @@ import java.util.Set;
 final class EntitySpatialIndex<T extends Entity> {
     private final List<T> entities;
     private final double cellSize;
-    private final Map<Cell, Set<Integer>> buckets = new HashMap<>();
+    private final Map<Cell, List<Integer>> buckets = new HashMap<>();
     private final IdentityHashMap<T, Integer> indexes = new IdentityHashMap<>();
 
     EntitySpatialIndex(List<T> entities, double searchRadius) {
@@ -28,7 +26,7 @@ final class EntitySpatialIndex<T extends Entity> {
         for (int i = 0; i < entities.size(); i++) {
             T entity = entities.get(i);
             indexes.put(entity, i);
-            buckets.computeIfAbsent(cellFor(entity), ignored -> new HashSet<>()).add(i);
+            buckets.computeIfAbsent(cellFor(entity), ignored -> new ArrayList<>()).add(i);
         }
     }
 
@@ -40,7 +38,7 @@ final class EntitySpatialIndex<T extends Entity> {
         for (long x = cell.x - 1; x <= cell.x + 1; x++) {
             for (long y = cell.y - 1; y <= cell.y + 1; y++) {
                 for (long z = cell.z - 1; z <= cell.z + 1; z++) {
-                    Set<Integer> bucket = buckets.get(new Cell(x, y, z));
+                    List<Integer> bucket = buckets.get(new Cell(x, y, z));
                     if (bucket == null) {
                         continue;
                     }
@@ -68,9 +66,9 @@ final class EntitySpatialIndex<T extends Entity> {
         }
 
         Cell cell = cellFor(entity);
-        Set<Integer> bucket = buckets.get(cell);
+        List<Integer> bucket = buckets.get(cell);
         if (bucket != null) {
-            bucket.remove(index);
+            bucket.remove(Integer.valueOf(index));
             if (bucket.isEmpty()) {
                 buckets.remove(cell);
             }

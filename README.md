@@ -38,6 +38,8 @@ updates, random ticks, and block updates.
 - **Distant Brain-mob throttle:** applies the same idea directly to
   `Brain.tick()` for villagers, piglins, hoglins, allays, frogs, and other
   Brain-driven mobs.
+- **Font width caching:** caches repeated plain-string width measurements
+  used by HUDs and menus, reducing CPU work without changing OpenGL rendering.
 - **Item merging:** periodically combines compatible nearby item entities
   around online players.
 - **XP orb merging:** combines nearby experience orbs. The implementation
