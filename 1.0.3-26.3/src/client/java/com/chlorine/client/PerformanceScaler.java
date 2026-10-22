@@ -4,9 +4,6 @@ import com.chlorine.Chlorine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 /**
  * Watches a rolling FPS average and works through a small ladder of
  * cheap, non-rendering-graph options — simulation distance, then entity
@@ -46,7 +43,10 @@ import java.util.Deque;
  * independently adjust the same option — see that file for why.
  */
 public class PerformanceScaler {
-    private final Deque<Integer> fpsSamples = new ArrayDeque<>();
+    private int[] fpsSamples = new int[0];
+    private int fpsSampleCount;
+    private int fpsSampleIndex;
+    private long fpsSampleTotal;
     private int ticksSinceLower = 0;
     private int ticksSinceRaise = 0;
     private int originalSimulationDistance = -1;
@@ -63,20 +63,17 @@ public class PerformanceScaler {
         originalSimulationDistance = SimDistanceBaseline.getOrCapture(simCurrent);
 
         int fps = client.getFps();
-        fpsSamples.addLast(fps);
-
         int window = Math.max(20, Chlorine.CONFIG.fpsCheckWindowTicks);
-        while (fpsSamples.size() > window) {
-            fpsSamples.removeFirst();
-        }
+        ensureSampleCapacity(window);
+        addFpsSample(fps);
 
         ticksSinceLower++;
         ticksSinceRaise++;
-        if (fpsSamples.size() < window) {
+        if (fpsSampleCount < window) {
             return; // still gathering samples
         }
 
-        double avg = fpsSamples.stream().mapToInt(Integer::intValue).average().orElse(fps);
+        double avg = (double) fpsSampleTotal / fpsSampleCount;
 
         int simFloor = SimDistanceBaseline.optionFloor(Chlorine.CONFIG.minSimulationDistance);
         boolean simAtFloor = simCurrent <= simFloor;
@@ -99,13 +96,13 @@ public class PerformanceScaler {
                 simOption.set(next);
                 SimDistanceBaseline.recordManagedValue(simOption.get());
                 ticksSinceLower = 0;
-                fpsSamples.clear();
+                clearFpsSamples();
                 Chlorine.LOGGER.debug("FPS averaging {}, lowering simulation distance {} -> {}", avg, simCurrent, next);
             } else if (entityOption != null && !entityAtFloor) {
                 double next = Math.max(Chlorine.CONFIG.minEntityDistanceScaling, entityCurrent - Chlorine.CONFIG.entityDistanceScalingStep);
                 entityOption.set(next);
                 ticksSinceLower = 0;
-                fpsSamples.clear();
+                clearFpsSamples();
                 Chlorine.LOGGER.debug("FPS averaging {}, lowering entity distance scaling {} -> {}", avg, entityCurrent, next);
             } else if (Chlorine.CONFIG.enableParticleScaling) {
                 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -132,14 +129,14 @@ public class PerformanceScaler {
                 double next = Math.min(originalEntityDistanceScaling, entityCurrent + Chlorine.CONFIG.entityDistanceScalingStep);
                 entityOption.set(next);
                 ticksSinceRaise = 0;
-                fpsSamples.clear();
+                clearFpsSamples();
                 Chlorine.LOGGER.debug("FPS averaging {}, raising entity distance scaling {} -> {}", avg, entityCurrent, next);
             } else if (simCurrent < effectiveSimCeiling()) {
                 int next = Math.min(effectiveSimCeiling(), simCurrent + Math.max(1, Chlorine.CONFIG.simulationDistanceStep));
                 simOption.set(next);
                 SimDistanceBaseline.recordManagedValue(simOption.get());
                 ticksSinceRaise = 0;
-                fpsSamples.clear();
+                clearFpsSamples();
                 SimDistanceBaseline.clearIfAtOrAboveBaseline(next);
                 Chlorine.LOGGER.debug("FPS averaging {}, raising simulation distance {} -> {}", avg, simCurrent, next);
             }
@@ -158,5 +155,35 @@ public class PerformanceScaler {
             return Math.min(originalSimulationDistance, Chlorine.CONFIG.maxSimulationDistance);
         }
         return originalSimulationDistance;
+    }
+
+    private void ensureSampleCapacity(int window) {
+        if (fpsSamples.length == window) {
+            return;
+        }
+
+        fpsSamples = new int[window];
+        clearFpsSamples();
+    }
+
+    private void addFpsSample(int fps) {
+        if (fpsSampleCount == fpsSamples.length) {
+            fpsSampleTotal -= fpsSamples[fpsSampleIndex];
+        } else {
+            fpsSampleCount++;
+        }
+
+        fpsSamples[fpsSampleIndex] = fps;
+        fpsSampleTotal += fps;
+        fpsSampleIndex++;
+        if (fpsSampleIndex == fpsSamples.length) {
+            fpsSampleIndex = 0;
+        }
+    }
+
+    private void clearFpsSamples() {
+        fpsSampleCount = 0;
+        fpsSampleIndex = 0;
+        fpsSampleTotal = 0;
     }
 }

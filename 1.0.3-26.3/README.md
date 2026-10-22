@@ -5,7 +5,7 @@ Chlorine is a **Fabric performance and power-management mod for Minecraft
 laptop power usage while leaving chunk rendering and renderer internals to
 specialized mods.
 
-Current release: **1.0.4**
+Current release: **1.0.5**
 
 ## What it does
 
@@ -79,7 +79,7 @@ removing the mod.
 
 [Mod Menu](https://modrinth.com/mod/modmenu) is optional. When installed, it
 adds Chlorine's **Config** button to the mod list. Chlorine is designed to
-Chlorine 1.0.4 requires Sodium because its client workload governors integrate
+Chlorine 1.0.5 requires Sodium because its client workload governors integrate
 directly with Sodium's renderer. Lithium, FerriteCore, EntityCulling,
 ImmediatelyFast, and Iris remain optional.
 
@@ -87,7 +87,7 @@ ImmediatelyFast, and Iris remain optional.
 
 1. Install Fabric Loader for Minecraft 26.3.
 2. Install Fabric API and Cloth Config API.
-3. Place `chlorine-1.0.4.jar` in the instance's `mods` directory.
+3. Place `chlorine-1.0.5.jar` in the instance's `mods` directory.
 4. Optionally install Mod Menu for the in-game configuration screen.
 
 The configuration file is created at:
@@ -127,7 +127,7 @@ Important interactions:
   on the client simulation-distance option.
 - Chlorine lowers the client simulation-distance minimum to 1 chunk, including
   in Sodium's settings screen when Sodium is installed.
-- Sodium 1.0.4's workload governor samples Sodium's public builder counters at
+- Sodium 1.0.5's workload governor samples Sodium's public builder counters at
   `RenderSectionManager.finalizeRenderLists(...)`. It defers the immediate
   update request only after a sustained low-FPS window, a real queued-job
   backlog, and a stable camera all agree that synchronous work is contributing

@@ -217,7 +217,7 @@ public class ChlorineConfig {
      *  this fraction (0.0–1.0) are dropped before reaching OpenAL. */
     public double soundPreCullVolumeThreshold = 0.05;
 
-    // --- Sodium workload governor (client, Sodium required in 1.0.4) ---
+    // --- Sodium workload governor (client, Sodium required in 1.0.5) ---
     // These controls cooperate at Sodium's render-list finalization boundary.
     // They do not replace Sodium's culler, builder, or executor and therefore
     // cannot strand queued work or mutate Sodium's private worker pool.

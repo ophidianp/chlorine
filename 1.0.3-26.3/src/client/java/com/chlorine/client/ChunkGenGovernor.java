@@ -52,11 +52,12 @@ public class ChunkGenGovernor {
 
         double dx = x - prevX;
         double dz = z - prevZ;
-        double speed = Math.sqrt(dx * dx + dz * dz); // blocks per tick
+        double speedSq = dx * dx + dz * dz;
         prevX = x;
         prevZ = z;
 
-        boolean fast = speed >= Chlorine.CONFIG.chunkGenSpeedThreshold;
+        double speedThreshold = Math.max(0.0, Chlorine.CONFIG.chunkGenSpeedThreshold);
+        boolean fast = speedSq >= speedThreshold * speedThreshold;
 
         OptionInstance<Integer> simOption = client.options.simulationDistance();
         int simCurrent = simOption.get();
@@ -73,7 +74,7 @@ public class ChunkGenGovernor {
                 SimDistanceBaseline.recordManagedValue(simOption.get());
                 Chlorine.LOGGER.debug(
                     "Fast travel detected ({} blocks/tick), lowering simulation distance {} -> {}",
-                    String.format("%.1f", speed), simCurrent, reduced
+                    String.format("%.1f", Math.sqrt(speedSq)), simCurrent, reduced
                 );
             }
             governing = true;
