@@ -73,20 +73,33 @@
               </ul>
             </div>
           </article>
-          <article class="detail-row" id="config">
+          <article class="detail-row" id="sodium">
             <span class="detail-index">04</span>
+            <div><p class="eyebrow">Work with the renderer.</p><h2>Sodium-aware workload control</h2></div>
+            <div class="detail-copy">
+              <ul>
+                <li><strong>Builder-pressure governor</strong> — samples Sodium's existing chunk-builder queue and worker occupancy at the verified render-list boundary.</li>
+                <li><strong>Frame-pacing protection</strong> — defers immediate terrain updates only when sustained low FPS, a real queued-job backlog, and a stable camera agree that synchronous work is contributing to pressure.</li>
+                <li><strong>Hysteresis and recovery</strong> — avoids rapid toggling and restores normal behavior after the frame rate recovers or pressure clears.</li>
+                <li><strong>Sodium GPU profile</strong> — can enable Sodium's exposed fog occlusion, block-face culling, and visible-texture animation settings without replacing Sodium's OpenGL renderer.</li>
+              </ul>
+              <p>This integration is designed for Chlorine 1.0.3 on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
+            </div>
+          </article>
+          <article class="detail-row" id="config">
+            <span class="detail-index">05</span>
             <div><p class="eyebrow">Choose what stays on.</p><h2>Your configuration</h2></div>
             <div class="detail-copy">
               <p>All features are independently configurable and can be disabled without removing the mod. Configure them in-game with Cloth Config, optionally surfaced through Mod Menu, or edit <code>config/chlorine.json</code> directly.</p>
-              <p>The in-game screen groups settings into: Simulation Distance Cap, Adaptive Scaler, Power Saver, Mob AI Throttle, Item Merging, XP Orb Merging, Sound Budget, Particle Budget, Low-End Auto-Tune, Beacon &amp; Portal Throttle, Chunk Gen Governor, Sound Pre-Cull, and Tick Diagnostics.</p>
-              <p>Chlorine is designed to coexist with Sodium, Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris — none of those mods is required.</p>
+              <p>The in-game screen groups settings into: Simulation Distance Cap, Adaptive Scaler, Power Saver, Mob AI Throttle, Item Merging, XP Orb Merging, Sound Budget, Particle Budget, Low-End Auto-Tune, Beacon &amp; Portal Throttle, Chunk Gen Governor, Sound Pre-Cull, Sodium Workload Governors, Sodium GPU Profile, and Tick Diagnostics.</p>
+              <p>Chlorine 1.0.3 requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
             </div>
           </article>
         </section>
 
       <section class="callout page-wrap">
         <div><p class="eyebrow">A NOTE ON PERFORMANCE</p><h2>Results depend on your world.</h2></div>
-        <p>Entity count, hardware, and other installed mods all matter. Defaults are conservative, not universal benchmarks. Throttling distant AI intentionally trades some background simulation frequency for lower CPU usage.</p>
+        <p>Entity count, hardware, and other installed mods all matter. Defaults are conservative, not universal benchmarks. Sodium's workload governor is intended to protect frame pacing under chunk-build pressure, not guarantee a universal FPS increase.</p>
       </section>
     </main>
 
