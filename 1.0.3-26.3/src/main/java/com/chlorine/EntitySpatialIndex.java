@@ -32,10 +32,14 @@ final class EntitySpatialIndex<T extends Entity> {
         }
     }
 
+    private final List<Integer> candidateScratch = new ArrayList<>();
+    private final List<T> nearbyScratch = new ArrayList<>();
+
     List<T> nearbyAfter(int index) {
         T entity = entities.get(index);
         Cell cell = cellFor(entity);
-        List<Integer> candidates = new ArrayList<>();
+        candidateScratch.clear();
+        nearbyScratch.clear();
 
         for (long x = cell.x - 1; x <= cell.x + 1; x++) {
             for (long y = cell.y - 1; y <= cell.y + 1; y++) {
@@ -46,19 +50,18 @@ final class EntitySpatialIndex<T extends Entity> {
                     }
                     for (int candidate : bucket) {
                         if (candidate > index) {
-                            candidates.add(candidate);
+                            candidateScratch.add(candidate);
                         }
                     }
                 }
             }
         }
 
-        Collections.sort(candidates);
-        List<T> nearby = new ArrayList<>(candidates.size());
-        for (int candidate : candidates) {
-            nearby.add(entities.get(candidate));
+        Collections.sort(candidateScratch);
+        for (int candidate : candidateScratch) {
+            nearbyScratch.add(entities.get(candidate));
         }
-        return nearby;
+        return nearbyScratch;
     }
 
     void remove(T entity) {
