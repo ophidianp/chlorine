@@ -46,8 +46,8 @@
           <div class="release-info">
             <p class="eyebrow">LATEST FOR <span id="selected-game-version">26.3</span></p>
             <h3 id="release-name">Chlorine</h3>
-            <p id="release-notes"></p>
-            <a class="text-link" id="release-page" href="https://github.com/ophidianp/chlorine/releases">Read release notes <span aria-hidden="true">↗</span></a>
+            <p id="release-notes">Check GitHub Releases for the full changelog and installation notes before downloading.</p>
+            <a class="text-link" id="release-page" href="https://github.com/ophidianp/chlorine/releases">View the changelog on GitHub Releases <span aria-hidden="true">↗</span></a>
           </div>
           <a class="button button-primary download-button" id="download-button" aria-disabled="true">Download .jar <span aria-hidden="true">↓</span></a>
         </div>
@@ -61,10 +61,10 @@
         <div class="section-heading"><p class="eyebrow">GETTING STARTED</p><h2>Three steps<br><span>to a smoother session.</span></h2></div>
         <div class="install-steps">
           <article><span>01</span><h3>Install Fabric</h3><p>Choose the Fabric Loader for the same Minecraft version as the Chlorine download.</p></article>
-          <article><span>02</span><h3>Add dependencies</h3><p>For Minecraft 26.3, install Fabric API, Cloth Config API, and Sodium 0.9.2 or newer. Mod Menu is optional for an in-game config button.</p></article>
+          <article><span>02</span><h3>Add dependencies</h3><p id="dependency-note">For Minecraft 26.3, install Fabric API, Cloth Config API, and Sodium 0.9.2 or newer. Mod Menu is optional for an in-game config button.</p></article>
           <article><span>03</span><h3>Drop in the JAR</h3><p>Place the Chlorine file in your Minecraft instance's <code>mods</code> folder and launch Fabric.</p></article>
         </div>
-        <p class="requirements-note"><strong>Requirements:</strong> Java 25 or newer. Fabric Loader 0.19.5+ and Sodium 0.9.2+ for Minecraft 26.3; the 26.2 release has its own dependency set. See the selected release notes if you need more detail.</p>
+        <p class="requirements-note" id="requirements-note"><strong>Requirements:</strong> Java 25 or newer. Fabric Loader 0.19.5+ and Sodium 0.9.2+ for Minecraft 26.3. Cloth Config API is required for both versions; Mod Menu is optional.</p>
       </section>
     </main>
 

@@ -8,6 +8,8 @@ const releaseElements = {
   notes: document.querySelector("#release-notes"),
   page: document.querySelector("#release-page"),
   download: document.querySelector("#download-button"),
+  dependency: document.querySelector("#dependency-note"),
+  requirements: document.querySelector("#requirements-note"),
 };
 
 let publishedReleases = [];
@@ -27,6 +29,17 @@ function renderRelease() {
     button.setAttribute("aria-pressed", String(button.dataset.gameVersion === selectedVersion));
   });
   releaseElements.version.textContent = selectedVersion;
+  if (selectedVersion === "26.3") {
+    releaseElements.dependency.textContent =
+      "For Minecraft 26.3, install Fabric API, Cloth Config API, and Sodium 0.9.2 or newer. Mod Menu is optional for an in-game config button.";
+    releaseElements.requirements.innerHTML =
+      "<strong>Requirements:</strong> Java 25 or newer. Fabric Loader 0.19.5+ for Minecraft 26.3, plus Cloth Config API and Sodium 0.9.2+.";
+  } else {
+    releaseElements.dependency.textContent =
+      "For Minecraft 26.2, install Fabric API and Cloth Config API. Sodium is not required for this release. Mod Menu is optional for an in-game config button.";
+    releaseElements.requirements.innerHTML =
+      "<strong>Requirements:</strong> Java 25 or newer. Fabric Loader 0.17.0+ for Minecraft 26.2, plus Cloth Config API. Sodium is not required for this release.";
+  }
 
   const release = publishedReleases.find((item) => gameVersion(item) === selectedVersion && jarAsset(item));
   if (!release) {
@@ -37,7 +50,8 @@ function renderRelease() {
 
   const asset = jarAsset(release);
   releaseElements.name.textContent = release.name;
-  releaseElements.notes.textContent = release.body || "No release notes have been added.";
+  releaseElements.notes.textContent =
+    "Check GitHub Releases for the full changelog and installation notes before downloading.";
   releaseElements.page.href = release.html_url;
   releaseElements.download.href = asset.browser_download_url;
   releaseElements.download.setAttribute("aria-disabled", "false");
