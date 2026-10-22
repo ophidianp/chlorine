@@ -33,7 +33,7 @@ public final class SodiumWorkloadGovernor {
     public static void initialize() {
         sodiumPresent = FabricLoader.getInstance().isModLoaded("sodium");
         if (!sodiumPresent) {
-            throw new IllegalStateException("Chlorine 1.0.3 requires Sodium 0.9.2 or newer");
+            throw new IllegalStateException("Chlorine 1.0.4 requires Sodium 0.9.2 or newer");
         }
         Chlorine.LOGGER.info("Sodium detected; adaptive workload governors enabled");
     }

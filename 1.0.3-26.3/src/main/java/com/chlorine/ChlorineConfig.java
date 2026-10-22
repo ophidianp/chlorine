@@ -217,7 +217,7 @@ public class ChlorineConfig {
      *  this fraction (0.0–1.0) are dropped before reaching OpenAL. */
     public double soundPreCullVolumeThreshold = 0.05;
 
-    // --- Sodium workload governor (client, Sodium required in 1.0.3) ---
+    // --- Sodium workload governor (client, Sodium required in 1.0.4) ---
     // These controls cooperate at Sodium's render-list finalization boundary.
     // They do not replace Sodium's culler, builder, or executor and therefore
     // cannot strand queued work or mutate Sodium's private worker pool.
@@ -239,6 +239,13 @@ public class ChlorineConfig {
     public int sodiumRecoveryFps = 45;
     /** Apply Sodium's GPU-oriented culling and animation settings on startup. */
     public boolean enableSodiumGpuProfile = true;
+
+    // --- Collision and fluid workload guards (server/common) ---
+    /** Cache stationary-entity block collision queries until any block changes. */
+    public boolean enableCollisionCache = true;
+    /** Maximum fluid callbacks allowed per ServerLevel tick; overflow is rescheduled one tick later. */
+    public boolean enableFluidTickGovernor = true;
+    public int maxFluidTicksPerTick = 4096;
 
     // --- Server tick-health diagnostics (server/common) ---
     // Pure observability, no behavior change: periodically logs a warning

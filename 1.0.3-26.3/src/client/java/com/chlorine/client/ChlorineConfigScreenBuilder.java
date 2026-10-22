@@ -315,6 +315,20 @@ public final class ChlorineConfigScreenBuilder {
                 .setSaveConsumer(v -> cfg.enableSodiumGpuProfile = v)
                 .build());
 
+        ConfigCategory rawPerformance = builder.getOrCreateCategory(Component.literal("Raw Performance Guards"));
+        rawPerformance.addEntry(eb.startBooleanToggle(Component.literal("Stationary collision cache"), cfg.enableCollisionCache)
+                .setTooltip(Component.literal("Caches block collision shapes for stationary entities until a block changes."))
+                .setSaveConsumer(v -> cfg.enableCollisionCache = v)
+                .build());
+        rawPerformance.addEntry(eb.startBooleanToggle(Component.literal("Fluid tick governor"), cfg.enableFluidTickGovernor)
+                .setTooltip(Component.literal("Defers excess fluid callbacks by one tick instead of allowing a single burst to monopolize a server tick."))
+                .setSaveConsumer(v -> cfg.enableFluidTickGovernor = v)
+                .build());
+        rawPerformance.addEntry(eb.startIntField(Component.literal("Max fluid ticks per level tick"), cfg.maxFluidTicksPerTick)
+                .setMin(1)
+                .setSaveConsumer(v -> cfg.maxFluidTicksPerTick = v)
+                .build());
+
         ConfigCategory tickDiagnostics = builder.getOrCreateCategory(Component.literal("Tick Diagnostics"));
         tickDiagnostics.addEntry(eb.startBooleanToggle(Component.literal("Enable tick diagnostics"), cfg.enableTickDiagnostics)
                 .setTooltip(Component.literal("Pure observability, no behavior change — logs a warning if average server tick time creeps above a threshold."))

@@ -5,7 +5,11 @@
 	"client": [
 		"ExampleClientMixin",
 		"SimulationDistanceRangeMixin",
-		"IntegratedServerSimulationDistanceMixin"
+		"IntegratedServerSimulationDistanceMixin",
+		"NoteParticleMathMixin",
+		"WaterCurrentParticleMathMixin",
+		"FallingParticleMathMixin",
+		"FireworkStarterMathMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
