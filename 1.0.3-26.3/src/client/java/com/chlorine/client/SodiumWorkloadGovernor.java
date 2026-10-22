@@ -3,11 +3,8 @@ package com.chlorine.client;
 import com.chlorine.Chlorine;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.Entity;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSectionManager;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Coordinates Sodium-specific workload controls without replacing Sodium's
@@ -15,9 +12,15 @@ import java.util.Deque;
  * sustained low-FPS window coincides with a measured builder backlog.
  */
 public final class SodiumWorkloadGovernor {
-    private static final Deque<Integer> FPS_SAMPLES = new ArrayDeque<>();
+    private static int[] fpsSamples = new int[0];
+    private static int fpsSampleCount;
+    private static int fpsSampleIndex;
+    private static long fpsSampleTotal;
     private static boolean sodiumPresent;
-    private static Vec3 lastCameraPosition;
+    private static double lastCameraX;
+    private static double lastCameraY;
+    private static double lastCameraZ;
+    private static boolean lastCameraPositionAvailable;
     private static boolean cameraStable;
     private static int queuedJobs;
     private static int busyThreads;
@@ -33,15 +36,15 @@ public final class SodiumWorkloadGovernor {
     public static void initialize() {
         sodiumPresent = FabricLoader.getInstance().isModLoaded("sodium");
         if (!sodiumPresent) {
-            throw new IllegalStateException("Chlorine 1.0.4 requires Sodium 0.9.2 or newer");
+            throw new IllegalStateException("Chlorine 1.0.5 requires Sodium 0.9.2 or newer");
         }
         Chlorine.LOGGER.info("Sodium detected; adaptive workload governors enabled");
     }
 
     public static void tick(Minecraft client) {
         if (!sodiumPresent || client.level == null) {
-            FPS_SAMPLES.clear();
-            lastCameraPosition = null;
+            clearSamples();
+            lastCameraPositionAvailable = false;
             cameraStable = false;
             queuedJobs = 0;
             busyThreads = 0;
@@ -61,18 +64,23 @@ public final class SodiumWorkloadGovernor {
         }
 
         int window = Math.max(10, Chlorine.CONFIG.sodiumWorkloadWindowTicks);
-        FPS_SAMPLES.addLast(client.getFps());
-        while (FPS_SAMPLES.size() > window) {
-            FPS_SAMPLES.removeFirst();
-        }
+        ensureSampleCapacity(window);
+        addFpsSample(client.getFps());
 
-        Vec3 cameraPosition = client.getCameraEntity() == null
-                ? client.player != null ? client.player.position() : Vec3.ZERO
-                : client.getCameraEntity().position();
-        cameraStable = lastCameraPosition != null
-                && cameraPosition.distanceToSqr(lastCameraPosition)
+        Entity cameraEntity = client.getCameraEntity();
+        if (cameraEntity == null) {
+            cameraEntity = client.player;
+        }
+        double cameraX = cameraEntity == null ? 0.0 : cameraEntity.getX();
+        double cameraY = cameraEntity == null ? 0.0 : cameraEntity.getY();
+        double cameraZ = cameraEntity == null ? 0.0 : cameraEntity.getZ();
+        cameraStable = lastCameraPositionAvailable
+                && squaredDistance(cameraX, cameraY, cameraZ)
                 <= square(Math.max(0.01, Chlorine.CONFIG.sodiumCullingMovementThreshold));
-        lastCameraPosition = cameraPosition;
+        lastCameraX = cameraX;
+        lastCameraY = cameraY;
+        lastCameraZ = cameraZ;
+        lastCameraPositionAvailable = true;
 
         boolean queuePressure = pressureSampleAvailable
                 && (queuedJobs >= Math.max(1, Chlorine.CONFIG.sodiumBuilderQueueThreshold)
@@ -103,7 +111,7 @@ public final class SodiumWorkloadGovernor {
      * These are read-only public metrics and do not change Sodium's queue.
      */
     public static void observeBuilderPressure(RenderSectionManager manager) {
-        if (!sodiumPresent || manager == null) {
+        if (!sodiumPresent || manager == null || !hasAnyGovernorEnabled()) {
             return;
         }
 
@@ -131,7 +139,7 @@ public final class SodiumWorkloadGovernor {
 
     private static boolean hasLowFrameRate() {
         int window = Math.max(10, Chlorine.CONFIG.sodiumWorkloadWindowTicks);
-        if (FPS_SAMPLES.size() < window) {
+        if (fpsSampleCount < window) {
             return false;
         }
 
@@ -139,15 +147,50 @@ public final class SodiumWorkloadGovernor {
     }
 
     private static double averageFps() {
-        if (FPS_SAMPLES.isEmpty()) {
+        if (fpsSampleCount == 0) {
             return 0.0;
         }
 
-        long total = 0;
-        for (int fps : FPS_SAMPLES) {
-            total += fps;
+        return (double) fpsSampleTotal / fpsSampleCount;
+    }
+
+    private static void ensureSampleCapacity(int window) {
+        if (fpsSamples.length == window) {
+            return;
         }
-        return (double) total / FPS_SAMPLES.size();
+
+        fpsSamples = new int[window];
+        fpsSampleCount = 0;
+        fpsSampleIndex = 0;
+        fpsSampleTotal = 0;
+    }
+
+    private static void addFpsSample(int fps) {
+        if (fpsSampleCount == fpsSamples.length) {
+            fpsSampleTotal -= fpsSamples[fpsSampleIndex];
+        } else {
+            fpsSampleCount++;
+        }
+
+        fpsSamples[fpsSampleIndex] = fps;
+        fpsSampleTotal += fps;
+        fpsSampleIndex++;
+        if (fpsSampleIndex == fpsSamples.length) {
+            fpsSampleIndex = 0;
+        }
+    }
+
+    private static void clearSamples() {
+        fpsSampleCount = 0;
+        fpsSampleIndex = 0;
+        fpsSampleTotal = 0;
+    }
+
+    private static double squaredDistance(double x, double y, double z) {
+        double dx = x - lastCameraX;
+        double dy = y - lastCameraY;
+        double dz = z - lastCameraZ;
+        return dx * dx + dy * dy + dz * dz;
     }
 
     private static double square(double value) {
