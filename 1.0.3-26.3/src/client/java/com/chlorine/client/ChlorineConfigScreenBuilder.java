@@ -299,6 +299,10 @@ public final class ChlorineConfigScreenBuilder {
                 .setMax(4.0)
                 .setSaveConsumer(v -> cfg.sodiumCullingMovementThreshold = v)
                 .build());
+        sodium.addEntry(eb.startBooleanToggle(Component.literal("Apply Sodium GPU profile"), cfg.enableSodiumGpuProfile)
+                .setTooltip(Component.literal("Enables Sodium fog occlusion, block-face culling, and visible-texture animation optimizations at startup."))
+                .setSaveConsumer(v -> cfg.enableSodiumGpuProfile = v)
+                .build());
 
         ConfigCategory tickDiagnostics = builder.getOrCreateCategory(Component.literal("Tick Diagnostics"));
         tickDiagnostics.addEntry(eb.startBooleanToggle(Component.literal("Enable tick diagnostics"), cfg.enableTickDiagnostics)

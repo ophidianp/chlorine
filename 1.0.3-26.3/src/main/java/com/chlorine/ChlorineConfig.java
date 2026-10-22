@@ -231,6 +231,8 @@ public class ChlorineConfig {
     public int sodiumWorkloadWindowTicks = 30;
     /** Minimum camera movement in blocks before a culling result is considered stale. */
     public double sodiumCullingMovementThreshold = 0.25;
+    /** Apply Sodium's GPU-oriented culling and animation settings on startup. */
+    public boolean enableSodiumGpuProfile = true;
 
     // --- Server tick-health diagnostics (server/common) ---
     // Pure observability, no behavior change: periodically logs a warning

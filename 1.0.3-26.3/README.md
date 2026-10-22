@@ -110,6 +110,7 @@ The in-game screen groups settings into:
 - Chunk Gen Governor
 - Sound Pre-Cull
 - Sodium Workload Governors
+- Sodium GPU Profile
 - Time-Budgeted Merge Work
 - Adaptive Effect Budgets
 - Tick Diagnostics
@@ -124,6 +125,10 @@ Important interactions:
   camera-stable culling pressure, worker-queue pressure reduction, and
   dynamic terrain workload scaling. They all use Sodium's existing queued
   render path; Chlorine does not replace Sodium's culler or worker pool.
+- The Sodium GPU profile enables Sodium's exposed fog-occlusion, block-face
+  culling, and visible-texture animation settings. It does not replace
+  Sodium's OpenGL renderer or attempt the GPU entity-transform work tracked
+  upstream as future research.
 - Item and XP-orb merge passes use small per-tick wall-clock budgets and
   resume where they stopped. Dense farms therefore cannot turn one merge pass
   into a large server-tick or frame-time spike.

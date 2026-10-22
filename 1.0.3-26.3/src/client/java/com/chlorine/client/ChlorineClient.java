@@ -21,6 +21,7 @@ public class ChlorineClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!autoTuneApplied[0]) {
                 LowEndAutoTune.applyIfNeeded(client);
+                SodiumGpuProfile.applyIfEnabled(client);
                 autoTuneApplied[0] = true;
             }
             if (client.level != null) {
