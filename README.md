@@ -38,9 +38,6 @@ updates, random ticks, and block updates.
 - **Distant Brain-mob throttle:** applies the same idea directly to
   `Brain.tick()` for villagers, piglins, hoglins, allays, frogs, and other
   Brain-driven mobs.
-- **Distant hopper backoff:** optionally reduces idle hopper transfer checks
-  far from players. It is off by default because redstone-heavy contraptions
-  may depend on the most frequent hopper timing.
 - **Item merging:** periodically combines compatible nearby item entities
   around online players.
 - **XP orb merging:** combines nearby experience orbs. The implementation

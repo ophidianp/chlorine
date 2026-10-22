@@ -131,14 +131,6 @@ public class ChlorineConfig {
     /** Orbs within this many blocks of each other get merged. */
     public double xpMergeRadius = 2.0;
 
-    // --- Hopper idle backoff (server/common) ---
-    // Hoppers already use a transfer cooldown, but loaded hoppers still
-    // execute their server tick path between transfer attempts. This option
-    // adds a conservative backoff for hoppers far from every player.
-    public boolean enableDistantHopperBackoff = false;
-    /** Hoppers outside the active player radius run their transfer check every Nth tick. */
-    public int hopperBackoffInterval = 4;
-
     // --- Sound instance budget (client) ---
     // Not distance-based — vanilla already attenuates/culls inaudible
     // sounds. This caps how many *new* sounds can start within the same
