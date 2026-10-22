@@ -87,6 +87,10 @@ public class ChlorineConfig {
     public double aiActiveRadius = 48.0;
     /** Beyond that radius, only run the AI goal selector every Nth tick. */
     public int aiThrottleInterval = 8;
+    /** Also throttle server-side navigation/path-following for distant mobs. */
+    public boolean enableDistantMobNavigationThrottle = false;
+    /** Beyond aiActiveRadius, run distant mob navigation every Nth tick. */
+    public int navigationThrottleInterval = 4;
 
     // --- Distant Brain-based mob throttle (server/common) ---
     // Villagers, piglins, hoglins, allays, frogs, and other Brain-driven

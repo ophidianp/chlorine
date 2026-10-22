@@ -4,6 +4,7 @@
   "package": "com.chlorine.mixin",
   "mixins": [
     "MobAiThrottleMixin",
+    "MobNavigationThrottleMixin",
     "BrainTickThrottleMixin"
   ],
   "client": [
