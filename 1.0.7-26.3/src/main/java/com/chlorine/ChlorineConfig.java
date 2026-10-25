@@ -240,6 +240,26 @@ public class ChlorineConfig {
     /** Apply Sodium's GPU-oriented culling and animation settings on startup. */
     public boolean enableSodiumGpuProfile = true;
 
+    // --- Sodium frame-time smoothing (client, patches Sodium internals) ---
+    /**
+     * Lower Sodium's minimum per-frame chunk upload budget. Sodium allows
+     * max(30% of the average frame, 10 ms) of uploads per frame; at high FPS
+     * that 10 ms floor is longer than a whole frame and shows up as spikes.
+     */
+    public boolean enableSodiumAdaptiveUploadBudget = true;
+    /** Minimum chunk upload time per frame in milliseconds (Sodium's own floor is 10). */
+    public double sodiumMinUploadBudgetMillis = 4.0;
+    /** Seconds after joining a world during which Sodium's full upload budget is kept so terrain fills in fast. */
+    public int sodiumUploadBudgetGraceSeconds = 10;
+    /** While FPS is low, shrink the radius in which block changes are rebuilt and shown immediately on the main thread. */
+    public boolean enableSodiumNearbyRebuildScaling = true;
+    /** Immediate-rebuild radius in blocks while FPS is low (Sodium's own value is 16). */
+    public double sodiumPressureRebuildDistance = 8.0;
+    /** Immediate-present radius in blocks while FPS is low (Sodium's own value is 64). */
+    public double sodiumPressurePresentDistance = 32.0;
+    /** While FPS is low, keep Sodium's visibility culling on its background thread even when the camera moves fast. */
+    public boolean enableSodiumAsyncCullingUnderPressure = true;
+
     // --- Collision and fluid workload guards (server/common) ---
     /** Cache stationary-entity block collision queries until any block changes. */
     public boolean enableCollisionCache = true;

@@ -314,6 +314,37 @@ public final class ChlorineConfigScreenBuilder {
                 .setTooltip(Component.literal("Enables Sodium fog occlusion, block-face culling, and visible-texture animation optimizations at startup."))
                 .setSaveConsumer(v -> cfg.enableSodiumGpuProfile = v)
                 .build());
+        sodium.addEntry(eb.startBooleanToggle(Component.literal("Adaptive chunk upload budget"), cfg.enableSodiumAdaptiveUploadBudget)
+                .setTooltip(Component.literal("Lowers Sodium's 10 ms minimum per-frame chunk upload time so uploads can't run longer than a frame at high FPS. New terrain may appear slightly later while exploring."))
+                .setSaveConsumer(v -> cfg.enableSodiumAdaptiveUploadBudget = v)
+                .build());
+        sodium.addEntry(eb.startDoubleField(Component.literal("Minimum upload budget (ms)"), cfg.sodiumMinUploadBudgetMillis)
+                .setMin(0.5)
+                .setMax(10.0)
+                .setSaveConsumer(v -> cfg.sodiumMinUploadBudgetMillis = v)
+                .build());
+        sodium.addEntry(eb.startIntField(Component.literal("Full upload budget after joining (seconds)"), cfg.sodiumUploadBudgetGraceSeconds)
+                .setMin(0)
+                .setSaveConsumer(v -> cfg.sodiumUploadBudgetGraceSeconds = v)
+                .build());
+        sodium.addEntry(eb.startBooleanToggle(Component.literal("Shrink nearby rebuild radius under pressure"), cfg.enableSodiumNearbyRebuildScaling)
+                .setTooltip(Component.literal("While FPS is low, fewer nearby block changes are rebuilt on the main thread right away (TNT, pistons, redstone)."))
+                .setSaveConsumer(v -> cfg.enableSodiumNearbyRebuildScaling = v)
+                .build());
+        sodium.addEntry(eb.startDoubleField(Component.literal("Immediate rebuild radius under pressure (blocks)"), cfg.sodiumPressureRebuildDistance)
+                .setMin(0.0)
+                .setMax(16.0)
+                .setSaveConsumer(v -> cfg.sodiumPressureRebuildDistance = v)
+                .build());
+        sodium.addEntry(eb.startDoubleField(Component.literal("Immediate present radius under pressure (blocks)"), cfg.sodiumPressurePresentDistance)
+                .setMin(0.0)
+                .setMax(64.0)
+                .setSaveConsumer(v -> cfg.sodiumPressurePresentDistance = v)
+                .build());
+        sodium.addEntry(eb.startBooleanToggle(Component.literal("Async culling under pressure"), cfg.enableSodiumAsyncCullingUnderPressure)
+                .setTooltip(Component.literal("While FPS is low, keeps Sodium's visibility culling on its background thread during fast camera movement. Can cause brief pop-in at screen edges while flying."))
+                .setSaveConsumer(v -> cfg.enableSodiumAsyncCullingUnderPressure = v)
+                .build());
 
         ConfigCategory rawPerformance = builder.getOrCreateCategory(Component.literal("Raw Performance Guards"));
         rawPerformance.addEntry(eb.startBooleanToggle(Component.literal("Stationary collision cache"), cfg.enableCollisionCache)
