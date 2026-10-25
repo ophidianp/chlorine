@@ -47,18 +47,19 @@ public abstract class MobAiThrottleMixin {
             return;
         }
 
-        Player nearest = level.getNearestPlayer(self, Chlorine.CONFIG.aiActiveRadius);
-        if (nearest != null) {
-            // Someone's close enough to notice — always tick AI normally.
-            return;
-        }
-
         int interval = Math.max(1, Chlorine.CONFIG.aiThrottleInterval);
-        long gameTime = level.getGameTime();
 
         // Offset by entity ID so throttled mobs don't all "pause" on the
         // same tick — that would look like synchronized lag/stutter.
-        if ((gameTime + self.getId()) % interval != 0) {
+        // This mob ticks on this step either way, so skip the (comparatively
+        // expensive) nearest-player search and let it run.
+        if ((level.getGameTime() + self.getId()) % interval == 0) {
+            return;
+        }
+
+        Player nearest = level.getNearestPlayer(self, Chlorine.CONFIG.aiActiveRadius);
+        if (nearest == null) {
+            // Nobody close enough to notice — skip this off-tick.
             ci.cancel();
         }
     }

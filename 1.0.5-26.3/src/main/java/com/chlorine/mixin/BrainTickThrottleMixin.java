@@ -49,18 +49,18 @@ public abstract class BrainTickThrottleMixin {
             return;
         }
 
-        Player nearest = level.getNearestPlayer(owner, Chlorine.CONFIG.aiActiveRadius);
-        if (nearest != null) {
-            // Someone's close enough to notice — always tick normally.
+        int interval = Math.max(1, Chlorine.CONFIG.brainThrottleInterval);
+
+        // Same entity-ID offset trick as MobAiThrottleMixin, so throttled
+        // mobs don't all "pause" on the same tick. This mob ticks on this
+        // step either way, so skip the nearest-player search.
+        if ((level.getGameTime() + owner.getId()) % interval == 0) {
             return;
         }
 
-        int interval = Math.max(1, Chlorine.CONFIG.brainThrottleInterval);
-        long gameTime = level.getGameTime();
-
-        // Same entity-ID offset trick as MobAiThrottleMixin, so throttled
-        // mobs don't all "pause" on the same tick.
-        if ((gameTime + owner.getId()) % interval != 0) {
+        Player nearest = level.getNearestPlayer(owner, Chlorine.CONFIG.aiActiveRadius);
+        if (nearest == null) {
+            // Nobody close enough to notice — skip this off-tick.
             ci.cancel();
         }
     }
