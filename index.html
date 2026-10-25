@@ -7,7 +7,7 @@
     <meta name="description" content="Chlorine is a configurable Fabric performance and power-management mod for Minecraft.">
     <title>Chlorine</title>
     <link rel="icon" type="image/png" href="assets/chlorine-icon.png">
-    <link rel="stylesheet" href="assets/site.css?v=4">
+    <link rel="stylesheet" href="assets/site.css?v=5">
     <script src="assets/site.js?v=3" defer></script>
   </head>
   <body>
@@ -144,12 +144,12 @@
         <div class="compat-copy">
           <p class="eyebrow">A GOOD NEIGHBOR</p>
           <h2>Fits into the<br><span>mods you already use.</span></h2>
-          <p>Chlorine 1.0.3 works directly with Sodium's 26.3 renderer while the other companions remain optional.</p>
+          <p>Chlorine 1.0.5 works directly with Sodium's 26.3 renderer while the other companions remain optional.</p>
         </div>
         <div class="compat-panel">
-          <span>Sodium · required for 1.0.3</span><span>Lithium</span><span>FerriteCore</span>
+          <span>Sodium · required for 1.0.5</span><span>Lithium</span><span>FerriteCore</span>
           <span>EntityCulling</span><span>ImmediatelyFast</span><span>Iris</span>
-          <small>Sodium, Fabric API, and Cloth Config are required for 1.0.3 · other companions are optional</small>
+          <small>Sodium, Fabric API, and Cloth Config are required for 1.0.5 · other companions are optional</small>
         </div>
       </section>
 
@@ -157,7 +157,7 @@
         <div class="faq-heading"><p class="eyebrow">GOOD TO KNOW</p><h2>A few quick<br><span>answers.</span></h2></div>
         <div class="faq-list">
           <details><summary>Does Chlorine change render distance?<span aria-hidden="true">+</span></summary><p>No. Its adaptive tuning works with simulation distance; render distance is intentionally left alone to avoid expensive chunk render graph rebuilds.</p></details>
-          <details><summary>Do I need another performance mod?<span aria-hidden="true">+</span></summary><p>For Chlorine 1.0.3 on Minecraft 26.3, Sodium 0.9.2 or newer is required because the workload governor integrates with Sodium's renderer. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris remain optional.</p></details>
+          <details><summary>Do I need another performance mod?<span aria-hidden="true">+</span></summary><p>For Chlorine 1.0.5 on Minecraft 26.3, Sodium 0.9.2 or newer is required because the workload governor integrates with Sodium's renderer. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris remain optional.</p></details>
           <details><summary>Will it improve performance in every world?<span aria-hidden="true">+</span></summary><p>Results depend on your hardware, world, entity count, and mod setup. Chlorine provides configurable tools, not a universal FPS guarantee.</p></details>
         </div>
       </section>
@@ -175,9 +175,12 @@
     </main>
 
     <footer class="site-footer page-wrap">
-      <a class="brand brand-small" href="index.html"><img src="assets/chlorine-icon.png" alt="" width="26" height="26"><span>Chlorine</span></a>
-      <p>Made for the worlds you make.</p>
-      <div><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></div>
+      <div class="footer-left">
+        <a class="brand brand-small" href="index.html"><img src="assets/chlorine-icon.png" alt="" width="26" height="26"><span>Chlorine</span></a>
+        <p>Made for the worlds you make.</p>
+      </div>
+      <p class="footer-copy">&copy; 2026 Pavan Nemani &nbsp; MIT Licence</p>
+      <div class="footer-links"><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></div>
     </footer>
   </body>
 </html>
