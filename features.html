@@ -1,114 +1,150 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0d111b">
+    <meta name="theme-color" content="#070b13">
     <meta name="description" content="Explore Chlorine's configurable Minecraft performance and power-management features.">
     <title>Features — Chlorine</title>
     <link rel="icon" type="image/png" href="assets/chlorine-icon.png">
-    <link rel="stylesheet" href="assets/site.css?v=5">
-    <script src="assets/site.js?v=3" defer></script>
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("chlorine-theme")==="light"?"light":"dark"}catch(e){}</script>
+    <link rel="stylesheet" href="assets/site.css?v=7">
+    <script src="assets/site.js?v=4" defer></script>
+    <script src="assets/demos.js?v=2" defer></script>
   </head>
   <body>
+    <div class="backdrop" aria-hidden="true"><div class="aurora aurora-a"></div><div class="aurora aurora-b"></div></div>
+    <div class="scroll-progress" aria-hidden="true"></div>
+
     <header class="site-header">
-      <a class="brand" href="index.html" aria-label="Chlorine home"><img src="assets/chlorine-icon.png" alt="" width="36" height="36"><span>Chlorine</span></a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <a class="brand" href="index.html" aria-label="Chlorine home"><img src="assets/chlorine-icon.png" alt="" width="30" height="30"><span>Chlorine</span></a>
       <nav class="site-nav" id="site-nav" aria-label="Main navigation">
-        <a href="index.html">Home</a><a href="features.html" aria-current="page">Features</a><a href="downloads.html">Download</a><a href="benchmarks.html">Benchmarks</a>
+        <a href="index.html">Home</a>
+        <a href="features.html" aria-current="page">Features</a>
+        <a href="downloads.html">Download</a>
+        <a href="benchmarks.html">Benchmarks</a>
       </nav>
-      <button class="theme-toggle" type="button" role="switch" aria-checked="true" aria-label="Switch to light mode">
-        <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
-        <span class="theme-label">Dark</span>
-      </button>
-      <a class="header-download" href="downloads.html">Get Chlorine <span aria-hidden="true">↗</span></a>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch to light mode">
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <a class="btn btn-primary btn-sm" href="downloads.html">Get Chlorine <span class="arrow" aria-hidden="true">↗</span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><span></span></button>
+      </div>
     </header>
 
     <main>
-      <section class="page-hero page-wrap">
-        <p class="eyebrow"><span class="status-dot"></span> WHAT CHLORINE DOES</p>
-        <h1>Small adjustments.<br><span>A more considered world.</span></h1>
-          <p>Chlorine is a Fabric performance and power-management mod for Minecraft 26.3. It targets CPU-side simulation work, bursty entity effects, and laptop power usage while leaving chunk rendering and renderer internals to specialized mods.</p>
+      <section class="page-hero wrap">
+        <p class="eyebrow" data-reveal><span class="status-dot"></span> What Chlorine does</p>
+        <h1 class="split">Small adjustments. <span class="grad">A more considered world.</span></h1>
+        <p class="lede" data-reveal style="--d: 300ms">Chlorine is a Fabric performance and power-management mod for Minecraft 26.3. It targets CPU-side simulation work, bursty entity effects, and laptop power usage while leaving chunk rendering and renderer internals to specialized mods.</p>
       </section>
 
-      <section class="detail-list page-wrap">
-        <article class="detail-row" id="adaptive">
-          <span class="detail-index">01</span>
-            <div><p class="eyebrow">Adapt to the moment.</p><h2>Adaptive client tuning</h2></div>
-          <div class="detail-copy">
-              <ul>
-                <li><strong>Adaptive simulation distance</strong> — monitors a rolling FPS average and lowers simulation distance when performance falls below the configured threshold, then raises it again after a recovery cooldown.</li>
-                <li><strong>Entity-distance scaling</strong> — can reduce the entity-distance multiplier after simulation distance reaches its configured floor.</li>
-                <li><strong>Particle fallback</strong> — can reduce the particle setting as a last resort.</li>
-                <li><strong>Simulation-distance cap</strong> — optionally prevents other tuning systems from raising simulation distance above a fixed ceiling.</li>
-                <li><strong>Fast-travel chunk governor</strong> — temporarily lowers simulation distance while moving quickly (Elytra, Riptide trident), then restores it after a cooldown.</li>
-              </ul>
-              <p>Chlorine intentionally changes <strong>simulation distance</strong>, not render distance. Render-distance changes can rebuild the entire chunk render graph and cause a large hitch; simulation distance instead targets server ticking, entity updates, random ticks, and block updates.</p>
-            </div>
-          </article>
-          <article class="detail-row" id="world">
-            <span class="detail-index">02</span>
-            <div><p class="eyebrow">Ease background work.</p><h2>Server and gameplay-side optimization</h2></div>
-            <div class="detail-copy">
-              <ul>
-                <li><strong>Distant classic-mob AI throttle</strong> — staggers goal-selector AI for mobs such as zombies and skeletons when no player is nearby. Physics and nearby mobs are not throttled.</li>
-                <li><strong>Distant Brain-mob throttle</strong> — applies the same idea directly to <code>Brain.tick()</code> for villagers, piglins, hoglins, allays, frogs, and other Brain-driven mobs.</li>
-                <li><strong>Item merging</strong> — periodically combines compatible nearby item entities around online players.</li>
-                <li><strong>XP orb merging</strong> — combines nearby experience orbs. Verifies the internal value update before discarding an orb and disables itself for the session if that operation cannot be verified.</li>
-                <li><strong>Server tick diagnostics</strong> — optionally logs a warning when average server tick time exceeds the configured threshold. Observability only; it does not alter server behavior.</li>
-              </ul>
-            </div>
-          </article>
-          <article class="detail-row" id="comfort">
-            <span class="detail-index">03</span>
-            <div><p class="eyebrow">Make busy moments gentler.</p><h2>Client effects and power saving</h2></div>
-            <div class="detail-copy">
-              <ul>
-                <li><strong>Unfocused-window power saver</strong> — caps FPS while the game window is unfocused or minimized and can hide clouds during that period.</li>
-                <li><strong>Sound budget</strong> — limits how many new sounds may start in one client tick, smoothing bursts from farms, combat, or other events.</li>
-                <li><strong>Sound pre-cull</strong> — drops very quiet distance-attenuated sounds before they reach the audio engine.</li>
-                <li><strong>Particle budget</strong> — limits particle creation per client tick to smooth fireworks, explosions, potion clouds, and similar bursts.</li>
-                <li><strong>Beacon and portal throttles</strong> — skips distant beacon beams and Nether portal ambient particles when enabled.</li>
-                <li><strong>Low-end auto-tune</strong> — once per launch, detects constrained memory or CPU availability and applies lighter vanilla visual defaults.</li>
-              </ul>
-            </div>
-          </article>
-          <article class="detail-row" id="sodium">
-            <span class="detail-index">04</span>
-            <div><p class="eyebrow">Work with the renderer.</p><h2>Sodium-aware workload control</h2></div>
-            <div class="detail-copy">
-              <ul>
-                <li><strong>Builder-pressure governor</strong> — samples Sodium's existing chunk-builder queue and worker occupancy at the verified render-list boundary.</li>
-                <li><strong>Frame-pacing protection</strong> — defers immediate terrain updates only when sustained low FPS, a real queued-job backlog, and a stable camera agree that synchronous work is contributing to pressure.</li>
-                <li><strong>Hysteresis and recovery</strong> — avoids rapid toggling and restores normal behavior after the frame rate recovers or pressure clears.</li>
-                <li><strong>Sodium GPU profile</strong> — can enable Sodium's exposed fog occlusion, block-face culling, and visible-texture animation settings without replacing Sodium's OpenGL renderer.</li>
-              </ul>
-              <p>This integration is designed for Chlorine 1.0.6 on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
-            </div>
-          </article>
-          <article class="detail-row" id="config">
-            <span class="detail-index">05</span>
-            <div><p class="eyebrow">Choose what stays on.</p><h2>Your configuration</h2></div>
-            <div class="detail-copy">
-              <p>All features are independently configurable and can be disabled without removing the mod. Configure them in-game with Cloth Config, optionally surfaced through Mod Menu, or edit <code>config/chlorine.json</code> directly.</p>
-              <p>The in-game screen groups settings into: Simulation Distance Cap, Adaptive Scaler, Power Saver, Mob AI Throttle, Item Merging, XP Orb Merging, Sound Budget, Particle Budget, Low-End Auto-Tune, Beacon &amp; Portal Throttle, Chunk Gen Governor, Sound Pre-Cull, Sodium Workload Governors, Sodium GPU Profile, and Tick Diagnostics.</p>
-              <p>Chlorine 1.0.6 requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
-            </div>
-          </article>
-        </section>
+      <div class="feature-layout wrap">
+        <nav class="toc" aria-label="On this page">
+          <a href="#adaptive">Adaptive tuning</a>
+          <a href="#world">World &amp; gameplay</a>
+          <a href="#comfort">Effects &amp; power</a>
+          <a href="#frames">Frame smoothing &amp; LOD</a>
+          <a href="#sodium">Sodium integration</a>
+          <a href="#config">Configuration</a>
+        </nav>
 
-      <section class="callout page-wrap">
-        <div><p class="eyebrow">A NOTE ON PERFORMANCE</p><h2>Results depend on your world.</h2></div>
-        <p>Entity count, hardware, and other installed mods all matter. Defaults are conservative, not universal benchmarks. Sodium's workload governor is intended to protect frame pacing under chunk-build pressure, not guarantee a universal FPS increase.</p>
+        <div>
+          <article class="feature-block" id="adaptive">
+            <div class="feature-block-head" data-reveal><span class="idx">01</span><div><p class="eyebrow">Adapt to the moment</p><h2>Adaptive client tuning</h2></div></div>
+            <div class="feature-items" data-stagger>
+              <div class="feature-item"><strong>Adaptive simulation distance</strong><span>Monitors a rolling FPS average and lowers simulation distance when performance falls below the configured threshold, then raises it again after a recovery cooldown.</span></div>
+              <div class="feature-item"><strong>Entity-distance scaling</strong><span>Can reduce the entity-distance multiplier after simulation distance reaches its configured floor.</span></div>
+              <div class="feature-item"><strong>Particle fallback</strong><span>Can reduce the particle setting as a last resort.</span></div>
+              <div class="feature-item"><strong>Simulation-distance cap</strong><span>Optionally prevents other tuning systems from raising simulation distance above a fixed ceiling.</span></div>
+              <div class="feature-item"><strong>Fast-travel chunk governor</strong><span>Temporarily lowers simulation distance while moving quickly (Elytra, Riptide trident), then restores it after a cooldown.</span></div>
+            </div>
+            <p class="feature-note" data-reveal>Chlorine intentionally changes <strong>simulation distance</strong>, not render distance. Render-distance changes can rebuild the entire chunk render graph and cause a large hitch; simulation distance instead targets server ticking, entity updates, random ticks, and block updates.</p>
+            <div data-demo="adaptive" data-reveal></div>
+          </article>
+
+          <article class="feature-block" id="world">
+            <div class="feature-block-head" data-reveal><span class="idx">02</span><div><p class="eyebrow">Ease background work</p><h2>Server and gameplay-side optimization</h2></div></div>
+            <div class="feature-items" data-stagger>
+              <div class="feature-item"><strong>Distant classic-mob AI throttle</strong><span>Staggers goal-selector AI for mobs such as zombies and skeletons when no player is nearby. Physics and nearby mobs are not throttled.</span></div>
+              <div class="feature-item"><strong>Distant Brain-mob throttle</strong><span>Applies the same idea directly to <code>Brain.tick()</code> for villagers, piglins, hoglins, allays, frogs, and other Brain-driven mobs.</span></div>
+              <div class="feature-item"><strong>Item merging</strong><span>Periodically combines compatible nearby item entities around online players.</span></div>
+              <div class="feature-item"><strong>XP orb merging</strong><span>Combines nearby experience orbs. Verifies the internal value update before discarding an orb and disables itself for the session if that operation cannot be verified.</span></div>
+              <div class="feature-item"><strong>Server tick diagnostics</strong><span>Optionally logs a warning when average server tick time exceeds the configured threshold. Observability only; it does not alter server behavior.</span></div>
+            </div>
+            <div data-demo="mobs" data-reveal style="margin-bottom: 18px"></div>
+            <div data-demo="merge" data-reveal></div>
+          </article>
+
+          <article class="feature-block" id="comfort">
+            <div class="feature-block-head" data-reveal><span class="idx">03</span><div><p class="eyebrow">Make busy moments gentler</p><h2>Client effects and power saving</h2></div></div>
+            <div class="feature-items" data-stagger>
+              <div class="feature-item"><strong>Unfocused-window power saver</strong><span>Caps FPS while the game window is unfocused or minimized and can hide clouds during that period.</span></div>
+              <div class="feature-item"><strong>Sound budget</strong><span>Limits how many new sounds may start in one client tick, smoothing bursts from farms, combat, or other events.</span></div>
+              <div class="feature-item"><strong>Sound pre-cull</strong><span>Drops very quiet distance-attenuated sounds before they reach the audio engine.</span></div>
+              <div class="feature-item"><strong>Particle budget</strong><span>Limits particle creation per client tick to smooth fireworks, explosions, potion clouds, and similar bursts.</span></div>
+              <div class="feature-item"><strong>Beacon and portal throttles</strong><span>Skips distant beacon beams and Nether portal ambient particles when enabled.</span></div>
+              <div class="feature-item"><strong>Low-end auto-tune</strong><span>Once per launch, detects constrained memory or CPU availability and applies lighter vanilla visual defaults.</span></div>
+            </div>
+            <div data-demo="particles" data-reveal style="margin-bottom: 18px"></div>
+            <div data-demo="power" data-reveal></div>
+          </article>
+
+          <article class="feature-block" id="frames">
+            <div class="feature-block-head" data-reveal><span class="idx">04</span><div><p class="eyebrow">Protect the 1% lows <span class="new-badge">NEW IN 1.0.6</span></p><h2>Frame smoothing and render LOD</h2></div></div>
+            <div class="feature-items" data-stagger>
+              <div class="feature-item"><strong>Light update smoothing</strong><span>When a large backlog of light updates builds up, processes it within a per-frame time budget instead of all at once, with a minimum amount of progress each frame.</span></div>
+              <div class="feature-item"><strong>Adaptive ambient effects</strong><span>Scales down ambient block effects such as dripping and smoke while the frame rate is under pressure, and restores them once it recovers.</span></div>
+              <div class="feature-item"><strong>Sign text LOD</strong><span>Skips drawing sign text beyond a configurable distance, where it is too small to read anyway.</span></div>
+              <div class="feature-item"><strong>Item drop LOD</strong><span>Draws distant dropped stacks as a single item instead of a pile of copies.</span></div>
+              <div class="feature-item"><strong>Block entity LOD</strong><span>Skips small, distant block entities such as chests and skulls. Large or always-visible ones, like beacon beams, are left alone.</span></div>
+              <div class="feature-item"><strong>Autosave smoothing</strong><span>The periodic autosave writes a limited number of chunks immediately and hands the rest to the game's own background saver, so nothing is lost and the 5-minute hitch shrinks.</span></div>
+            </div>
+            <div data-demo="lod" data-reveal style="margin-bottom: 18px"></div>
+            <div data-demo="autosave" data-reveal></div>
+          </article>
+
+          <article class="feature-block" id="sodium">
+            <div class="feature-block-head" data-reveal><span class="idx">05</span><div><p class="eyebrow">Work with the renderer</p><h2>Sodium-aware workload control</h2></div></div>
+            <div class="feature-items" data-stagger>
+              <div class="feature-item"><strong>Builder-pressure governor</strong><span>Samples Sodium's existing chunk-builder queue and worker occupancy at the verified render-list boundary.</span></div>
+              <div class="feature-item"><strong>Frame-pacing protection</strong><span>Defers immediate terrain updates only when sustained low FPS, a real queued-job backlog, and a stable camera agree that synchronous work is contributing to pressure.</span></div>
+              <div class="feature-item"><strong>Hysteresis and recovery</strong><span>Avoids rapid toggling and restores normal behavior after the frame rate recovers or pressure clears.</span></div>
+              <div class="feature-item"><strong>Sodium GPU profile</strong><span>Can enable Sodium's exposed fog occlusion, block-face culling, and visible-texture animation settings without replacing Sodium's OpenGL renderer.</span></div>
+            </div>
+            <p class="feature-note" data-reveal>This integration is designed for Chlorine 1.0.6 on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
+          </article>
+
+          <article class="feature-block" id="config">
+            <div class="feature-block-head" data-reveal><span class="idx">06</span><div><p class="eyebrow">Choose what stays on</p><h2>Your configuration</h2></div></div>
+            <div data-reveal>
+              <p class="lede" style="max-width: 60ch">All features are independently configurable and can be disabled without removing the mod. Configure them in-game with Cloth Config, optionally surfaced through Mod Menu, or edit <code>config/chlorine.json</code> directly.</p>
+              <div class="chips" style="margin: 30px 0">
+                <span class="chip">Simulation Distance Cap</span><span class="chip">Adaptive Scaler</span><span class="chip">Power Saver</span><span class="chip">Mob AI Throttle</span><span class="chip">Item Merging</span><span class="chip">XP Orb Merging</span><span class="chip">Sound Budget</span><span class="chip">Particle Budget</span><span class="chip">Low-End Auto-Tune</span><span class="chip">Beacon &amp; Portal Throttle</span><span class="chip">Chunk Gen Governor</span><span class="chip">Sound Pre-Cull</span><span class="chip req">Frame Smoothing</span><span class="chip req">Render LOD</span><span class="chip">Sodium Workload Governors</span><span class="chip">Sodium GPU Profile</span><span class="chip">Tick Diagnostics</span>
+                <small>The in-game config screen groups settings into these categories · highlighted ones are new in 1.0.6</small>
+              </div>
+              <p style="color: var(--muted)">Chlorine 1.0.6 requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <section class="wrap">
+        <div class="callout" data-reveal>
+          <div><p class="eyebrow">A note on performance</p><h2>Results depend on your world.</h2></div>
+          <p>Entity count, hardware, and other installed mods all matter. Defaults are conservative, not universal benchmarks. Sodium's workload governor is intended to protect frame pacing under chunk-build pressure, not guarantee a universal FPS increase. The demos on this page are illustrations of each idea, not measurements.</p>
+        </div>
       </section>
     </main>
 
-    <footer class="site-footer page-wrap">
-      <div class="footer-left">
-        <a class="brand brand-small" href="index.html"><img src="assets/chlorine-icon.png" alt="" width="26" height="26"><span>Chlorine</span></a>
+    <footer class="site-footer wrap">
+      <div>
+        <a class="brand" href="index.html"><img src="assets/chlorine-icon.png" alt="" width="24" height="24"><span>Chlorine</span></a>
         <p>Made for the worlds you make.</p>
       </div>
-      <p class="footer-copy">&copy; 2026 Pavan Nemani &nbsp; MIT Licence</p>
+      <p>&copy; 2026 Pavan Nemani · MIT Licence</p>
       <div class="footer-links"><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></div>
     </footer>
   </body>

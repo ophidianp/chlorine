@@ -26,6 +26,10 @@ function renderRelease() {
   versionButtons.forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.gameVersion === selectedVersion));
   });
+  const picker = document.querySelector(".version-picker");
+  if (picker) {
+    picker.dataset.selected = selectedVersion;
+  }
   releaseElements.version.textContent = selectedVersion;
   if (selectedVersion === "26.3") {
     releaseElements.dependencies.textContent =

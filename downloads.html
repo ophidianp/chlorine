@@ -1,79 +1,96 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0d111b">
+    <meta name="theme-color" content="#070b13">
     <meta name="description" content="Download Chlorine for Minecraft 26.2 or 26.3 from the latest GitHub release.">
     <title>Download — Chlorine</title>
     <link rel="icon" type="image/png" href="assets/chlorine-icon.png">
-    <link rel="stylesheet" href="assets/site.css?v=5">
-    <script src="assets/site.js?v=3" defer></script>
-    <script src="assets/releases.js?v=4" defer></script>
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("chlorine-theme")==="light"?"light":"dark"}catch(e){}</script>
+    <link rel="stylesheet" href="assets/site.css?v=7">
+    <script src="assets/site.js?v=4" defer></script>
+    <script src="assets/releases.js?v=5" defer></script>
   </head>
   <body>
+    <div class="backdrop" aria-hidden="true"><div class="aurora aurora-a"></div><div class="aurora aurora-b"></div></div>
+    <div class="scroll-progress" aria-hidden="true"></div>
+
     <header class="site-header">
-      <a class="brand" href="index.html" aria-label="Chlorine home"><img src="assets/chlorine-icon.png" alt="" width="36" height="36"><span>Chlorine</span></a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <a class="brand" href="index.html" aria-label="Chlorine home"><img src="assets/chlorine-icon.png" alt="" width="30" height="30"><span>Chlorine</span></a>
       <nav class="site-nav" id="site-nav" aria-label="Main navigation">
-        <a href="index.html">Home</a><a href="features.html">Features</a><a href="downloads.html" aria-current="page">Download</a><a href="benchmarks.html">Benchmarks</a>
+        <a href="index.html">Home</a>
+        <a href="features.html">Features</a>
+        <a href="downloads.html" aria-current="page">Download</a>
+        <a href="benchmarks.html">Benchmarks</a>
       </nav>
-      <button class="theme-toggle" type="button" role="switch" aria-checked="true" aria-label="Switch to light mode">
-        <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
-        <span class="theme-label">Dark</span>
-      </button>
-      <a class="header-download" href="https://github.com/ophidianp/chlorine/releases">GitHub releases <span aria-hidden="true">↗</span></a>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch to light mode">
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <a class="btn btn-primary btn-sm" href="https://github.com/ophidianp/chlorine/releases">GitHub releases <span class="arrow" aria-hidden="true">↗</span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><span></span></button>
+      </div>
     </header>
 
     <main>
-      <section class="page-hero download-hero page-wrap">
-        <p class="eyebrow"><span class="status-dot"></span> DOWNLOAD CHLORINE</p>
-        <h1>Choose your<br><span>Minecraft version.</span></h1>
-        <p>Downloads are loaded from GitHub, so the selector always points to the newest published release for your version.</p>
+      <section class="page-hero wrap">
+        <p class="eyebrow" data-reveal><span class="status-dot"></span> Download Chlorine</p>
+        <h1 class="split">Choose your <span class="grad">Minecraft version.</span></h1>
+        <p class="lede" data-reveal style="--d: 300ms">Downloads are loaded from GitHub, so the selector always points to the newest published release for your version.</p>
       </section>
 
-      <section class="release-panel page-wrap" aria-labelledby="version-heading">
-        <div class="release-panel-head">
-          <div><p class="eyebrow">VERSION SELECTOR</p><h2 id="version-heading">Which Minecraft do you play?</h2></div>
-          <span class="live-label"><span class="status-dot"></span> LIVE RELEASE DATA</span>
-        </div>
-        <div class="version-picker" role="group" aria-label="Minecraft version">
-          <button class="version-button" type="button" data-game-version="26.3" aria-pressed="true">Minecraft <strong>26.3</strong><span>Latest release</span></button>
-          <button class="version-button" type="button" data-game-version="26.2" aria-pressed="false">Minecraft <strong>26.2</strong><span>Previous version</span></button>
-        </div>
-        <p class="release-status" id="release-status" role="status" aria-live="polite">Checking GitHub for the latest releases…</p>
-        <div class="release-result" id="release-result" hidden>
-          <div class="release-info">
-            <p class="eyebrow">LATEST FOR <span id="selected-game-version">26.3</span></p>
-            <h3 id="release-name">Chlorine</h3>
-            <p id="release-dependencies"></p>
-            <a class="text-link" id="release-page" href="https://github.com/ophidianp/chlorine/releases">View release details on GitHub Releases <span aria-hidden="true">↗</span></a>
+      <section class="wrap">
+        <div class="release-panel" aria-labelledby="version-heading" data-reveal>
+          <div class="release-panel-head">
+            <div><p class="eyebrow">Version selector</p><h2 id="version-heading">Which Minecraft do you play?</h2></div>
+            <span class="live-label"><span class="status-dot"></span> LIVE RELEASE DATA</span>
           </div>
-          <a class="button button-primary download-button" id="download-button" aria-disabled="true">Download .jar <span aria-hidden="true">↓</span></a>
-        </div>
-        <div class="release-fallback">
-          <span>Want to browse every release?</span>
-          <a href="https://github.com/ophidianp/chlorine/releases">Open GitHub releases <span aria-hidden="true">↗</span></a>
+          <div class="version-picker" role="group" aria-label="Minecraft version" data-selected="26.3">
+            <span class="version-pill" aria-hidden="true"></span>
+            <button class="version-button" type="button" data-game-version="26.3" aria-pressed="true">Minecraft <strong>26.3</strong><span>Latest release</span></button>
+            <button class="version-button" type="button" data-game-version="26.2" aria-pressed="false">Minecraft <strong>26.2</strong><span>Previous version</span></button>
+          </div>
+          <p class="release-status" id="release-status" role="status" aria-live="polite">Checking GitHub for the latest releases…</p>
+          <div class="release-result" id="release-result" hidden>
+            <div>
+              <p class="eyebrow">Latest for <span id="selected-game-version">26.3</span></p>
+              <h3 id="release-name">Chlorine</h3>
+              <p id="release-dependencies"></p>
+              <a class="text-link" id="release-page" href="https://github.com/ophidianp/chlorine/releases">View release details on GitHub Releases <span aria-hidden="true">↗</span></a>
+            </div>
+            <a class="btn btn-primary" id="download-button" aria-disabled="true">Download .jar <span class="arrow" aria-hidden="true">↓</span></a>
+          </div>
+          <div class="release-fallback">
+            <span>Want to browse every release?</span>
+            <a href="https://github.com/ophidianp/chlorine/releases">Open GitHub releases <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
       </section>
 
-      <section class="install-section page-wrap">
-        <div class="section-heading"><p class="eyebrow">GETTING STARTED</p><h2>Three steps<br><span>to a smoother session.</span></h2></div>
-        <div class="install-steps">
-          <article><span>01</span><h3>Install Fabric</h3><p>Choose the Fabric Loader for the same Minecraft version as the Chlorine download.</p></article>
-          <article><span>02</span><h3>Check the download box</h3><p>Install the dependencies shown with your selected Minecraft version before launching Fabric.</p></article>
-          <article><span>03</span><h3>Drop in the JAR</h3><p>Place the Chlorine file in your Minecraft instance's <code>mods</code> folder and launch Fabric.</p></article>
+      <section class="section wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow" data-reveal>Getting started</p>
+            <h2 class="split">Three steps <span class="dim">to a smoother session.</span></h2>
+          </div>
         </div>
-        <p class="requirements-note"><strong>Java requirement:</strong> Java 25 or newer. Fabric Loader requirements are listed in each release's GitHub metadata.</p>
+        <div class="steps" data-stagger>
+          <article class="step"><span class="num">01</span><h3>Install Fabric</h3><p>Choose the Fabric Loader for the same Minecraft version as the Chlorine download.</p></article>
+          <article class="step"><span class="num">02</span><h3>Check the download box</h3><p>Install the dependencies shown with your selected Minecraft version before launching Fabric.</p></article>
+          <article class="step"><span class="num">03</span><h3>Drop in the JAR</h3><p>Place the Chlorine file in your Minecraft instance's <code>mods</code> folder and launch Fabric.</p></article>
+        </div>
+        <p class="requirements-note" data-reveal><strong>Java requirement:</strong> Java 25 or newer. Fabric Loader requirements are listed in each release's GitHub metadata.</p>
       </section>
     </main>
 
-    <footer class="site-footer page-wrap">
-      <div class="footer-left">
-        <a class="brand brand-small" href="index.html"><img src="assets/chlorine-icon.png" alt="" width="26" height="26"><span>Chlorine</span></a>
+    <footer class="site-footer wrap">
+      <div>
+        <a class="brand" href="index.html"><img src="assets/chlorine-icon.png" alt="" width="24" height="24"><span>Chlorine</span></a>
         <p>Made for the worlds you make.</p>
       </div>
-      <p class="footer-copy">&copy; 2026 Pavan Nemani &nbsp; MIT Licence</p>
+      <p>&copy; 2026 Pavan Nemani · MIT Licence</p>
       <div class="footer-links"><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></div>
     </footer>
   </body>
