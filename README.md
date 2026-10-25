@@ -63,6 +63,23 @@ updates, random ticks, and block updates.
 - **Low-end auto-tune:** once per launch, detects constrained memory or CPU
   availability and applies lighter vanilla visual defaults.
 
+### Frame smoothing and render LOD (1.0.6 and 1.0.7)
+
+- **Light update smoothing, adaptive ambient effects, sign text LOD, item drop
+  LOD, block entity LOD and autosave smoothing** (1.0.6): spread bursts of
+  work over several frames or ticks and skip detail that is too far away to
+  see.
+- **Adaptive chunk upload budget** (1.0.7): lowers Sodium's 10 ms minimum
+  per-frame chunk upload time so uploads cannot outlast a frame at high FPS.
+  The full budget is kept for the first seconds after joining a world.
+- **Nearby rebuild scaling** (1.0.7): while FPS is low, shrinks the radius in
+  which block changes are rebuilt and shown immediately on the main thread.
+- **Async culling under pressure** (1.0.7): while FPS is low, keeps Sodium's
+  visibility culling on its background thread during fast camera movement.
+
+The 1.0.7 patches change Sodium internals; if a future Sodium version
+changes that code, they switch themselves off instead of crashing the game.
+
 All features are independently configurable and can be disabled without
 removing the mod.
 
@@ -73,11 +90,12 @@ removing the mod.
 - Fabric API
 - Java **25 or newer**
 - [Cloth Config API](https://modrinth.com/mod/cloth-config) (required)
+- [Sodium 0.9.2 or newer](https://modrinth.com/mod/sodium) (required since 1.0.3)
 
 [Mod Menu](https://modrinth.com/mod/modmenu) is optional. When installed, it
 adds Chlorine's **Config** button to the mod list. Chlorine is designed to
-coexist with Sodium, Lithium, FerriteCore, EntityCulling, ImmediatelyFast,
-and Iris; none of those mods is required.
+coexist with Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris;
+none of those mods is required.
 
 ## Installation
 
