@@ -10,7 +10,7 @@
     <script>try{document.documentElement.dataset.theme=localStorage.getItem("chlorine-theme")==="light"?"light":"dark"}catch(e){}</script>
     <link rel="stylesheet" href="assets/site.css?v=7">
     <script src="assets/site.js?v=4" defer></script>
-    <script src="assets/demos.js?v=2" defer></script>
+    <script src="assets/demos.js?v=4" defer></script>
   </head>
   <body>
     <div class="backdrop" aria-hidden="true"><div class="aurora aurora-a"></div><div class="aurora aurora-b"></div></div>
@@ -114,7 +114,7 @@
               <div class="feature-item"><strong>Hysteresis and recovery</strong><span>Avoids rapid toggling and restores normal behavior after the frame rate recovers or pressure clears.</span></div>
               <div class="feature-item"><strong>Sodium GPU profile</strong><span>Can enable Sodium's exposed fog occlusion, block-face culling, and visible-texture animation settings without replacing Sodium's OpenGL renderer.</span></div>
             </div>
-            <p class="feature-note" data-reveal>This integration is designed for Chlorine 1.0.6 on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
+            <p class="feature-note" data-reveal>This integration is designed for Chlorine 1.0.3+ on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
           </article>
 
           <article class="feature-block" id="config">
@@ -125,7 +125,7 @@
                 <span class="chip">Simulation Distance Cap</span><span class="chip">Adaptive Scaler</span><span class="chip">Power Saver</span><span class="chip">Mob AI Throttle</span><span class="chip">Item Merging</span><span class="chip">XP Orb Merging</span><span class="chip">Sound Budget</span><span class="chip">Particle Budget</span><span class="chip">Low-End Auto-Tune</span><span class="chip">Beacon &amp; Portal Throttle</span><span class="chip">Chunk Gen Governor</span><span class="chip">Sound Pre-Cull</span><span class="chip req">Frame Smoothing</span><span class="chip req">Render LOD</span><span class="chip">Sodium Workload Governors</span><span class="chip">Sodium GPU Profile</span><span class="chip">Tick Diagnostics</span>
                 <small>The in-game config screen groups settings into these categories · highlighted ones are new in 1.0.6</small>
               </div>
-              <p style="color: var(--muted)">Chlorine 1.0.6 requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
+              <p style="color: var(--muted)">Chlorine 1.0.3+ requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
             </div>
           </article>
         </div>

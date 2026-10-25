@@ -812,70 +812,153 @@ function demoPower(host) {
   let focused = document.hasFocus();
   window.addEventListener("blur", () => { focused = false; });
   window.addEventListener("focus", () => { focused = true; });
-  const clouds = Array.from({ length: 7 }, () => ({ x: Math.random(), y: rand(0.08, 0.4), s: rand(0.7, 1.4), v: rand(0.01, 0.025) }));
-  const hills = Array.from({ length: 40 }, (_, i) => 0.62 + Math.sin(i * 0.7) * 0.04 + Math.sin(i * 1.9) * 0.02);
-  let sinceDraw = 1, frames = 0, fpsWindow = 0, fps = 0, time = 0, cloudFade = 1;
+  // Soft, layered landscape that pans slowly, so a low frame cap reads as visibly choppier motion.
+  const clouds = Array.from({ length: 6 }, (_, i) => ({ x: i / 6 + rand(0, 0.1), y: rand(0.12, 0.38), s: rand(0.7, 1.25), v: rand(0.006, 0.014) }));
+  const stars = Array.from({ length: 60 }, () => ({ x: Math.random(), y: Math.random() * 0.55, r: rand(0.4, 1.2), p: rand(0, 6.28) }));
+  const layers = [
+    { base: 0.58, amp: 0.07, freq: 1.3, speed: 0.012, seed: 1.7, depth: 0.25 },
+    { base: 0.68, amp: 0.06, freq: 2.1, speed: 0.024, seed: 4.2, depth: 0.55 },
+    { base: 0.78, amp: 0.05, freq: 3.2, speed: 0.045, seed: 8.9, depth: 0.85 },
+  ];
+  const frameLog = [];
+  let lastDraw = -1, fps = 0, cloudFade = 1, dim = 0, pan = 0;
 
-  runWhileVisible(host, (dt) => {
+  const ridge = (layer, u) => layer.base
+    + Math.sin((u + layer.seed) * layer.freq * 2.1) * layer.amp
+    + Math.sin((u * 2.7 + layer.seed) * layer.freq) * layer.amp * 0.45;
+
+  const cloud = (ctx, x, y, s, a) => {
+    const g = ctx.createLinearGradient(0, y - 22 * s, 0, y + 12 * s);
+    g.addColorStop(0, alpha("#ffffff", a));
+    g.addColorStop(1, alpha("#ffffff", a * 0.7));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    [[0, 0, 16], [18, -9, 20], [40, -2, 17], [58, 3, 12], [-16, 4, 11]].forEach(([ox, oy, r]) => {
+      ctx.moveTo(x + ox * s + r * s, y + oy * s);
+      ctx.arc(x + ox * s, y + oy * s, r * s, 0, Math.PI * 2);
+    });
+    ctx.fill();
+  };
+
+  runWhileVisible(host, (dt, now) => {
     const { ctx, w, h } = demo.view;
+    const light = palette.light;
     const unfocused = simulate.checked || !focused;
     const cap = unfocused ? 10 : 0;
-    sinceDraw += dt;
-    fpsWindow += dt;
-    time += dt;
-    if (fpsWindow >= 0.5) { fps = frames / fpsWindow; frames = 0; fpsWindow = 0; }
-    if (cap && sinceDraw < 1 / cap) return;
-    const step = sinceDraw;
-    sinceDraw = 0;
-    frames++;
-    cloudFade = lerp(cloudFade, unfocused && hideClouds.checked ? 0 : 1, 1 - Math.exp(-step * 5));
+    if (cap && now - lastDraw < 1 / cap - 0.002) return;
+    const step = lastDraw < 0 ? 0.016 : Math.min(0.2, now - lastDraw);
+    lastDraw = now;
+    frameLog.push(now);
+    while (frameLog.length && now - frameLog[0] > 1.6) frameLog.shift();
+    fps = frameLog.filter((t) => now - t <= 1).length;
+    pan += step;
+    cloudFade = lerp(cloudFade, unfocused && hideClouds.checked ? 0 : 1, 1 - Math.exp(-step * 6));
+    dim = lerp(dim, unfocused ? 1 : 0, 1 - Math.exp(-step * 6));
 
+    // Sky
     const sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, palette.light ? "#9cc8ff" : "#0d1a33");
-    sky.addColorStop(1, palette.light ? "#e4f0ff" : "#1a2c4d");
+    sky.addColorStop(0, light ? "#bcd8ff" : "#070d1c");
+    sky.addColorStop(0.65, light ? "#e3efff" : "#122245");
+    sky.addColorStop(1, light ? "#f4f8ff" : "#1b2f5c");
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, w, h);
 
-    ctx.fillStyle = palette.light ? "#fff6c8" : "#e8eefc";
-    ctx.beginPath(); ctx.arc(w * 0.82, h * 0.2, 16, 0, Math.PI * 2); ctx.fill();
+    if (!light) {
+      stars.forEach((s) => {
+        ctx.fillStyle = alpha("#ffffff", 0.35 + 0.35 * Math.sin(now * 1.3 + s.p));
+        ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+
+    // Moon or sun with a soft halo
+    const mx = w * 0.8, my = h * 0.24;
+    const halo = ctx.createRadialGradient(mx, my, 0, mx, my, 90);
+    halo.addColorStop(0, light ? "rgba(255, 236, 170, 0.75)" : alpha(palette.accent2, 0.35));
+    halo.addColorStop(1, "rgba(255, 255, 255, 0)");
+    ctx.fillStyle = halo;
+    ctx.fillRect(mx - 90, my - 90, 180, 180);
+    ctx.fillStyle = light ? "#fff3c4" : "#eaf2ff";
+    ctx.beginPath(); ctx.arc(mx, my, 17, 0, Math.PI * 2); ctx.fill();
 
     if (cloudFade > 0.01) {
-      ctx.globalAlpha = cloudFade * (palette.light ? 0.95 : 0.55);
-      ctx.fillStyle = "#ffffff";
       clouds.forEach((c) => {
-        c.x = (c.x + c.v * step) % 1.2;
-        const x = (c.x - 0.1) * w, y = c.y * h, s = 18 * c.s;
-        [[0, 0, 4, 1], [s * 0.8, -s * 0.5, 3, 1], [s * 2.2, 0, 3, 1]].forEach(([ox, oy, bw, bh]) => ctx.fillRect(x + ox, y + oy, s * bw * 0.5, s * bh * 0.5));
+        c.x = (c.x + c.v * step) % 1.25;
+        cloud(ctx, (c.x - 0.12) * w, c.y * h, c.s, cloudFade * (light ? 0.9 : 0.2));
       });
+    }
+
+    // Ridges, back to front, tinted toward the accent with atmospheric fade
+    layers.forEach((layer) => {
+      const offset = pan * layer.speed;
+      const top = h * (layer.base - layer.amp * 1.5);
+      const g = ctx.createLinearGradient(0, top, 0, h);
+      if (light) {
+        g.addColorStop(0, `hsl(${215 - layer.depth * 10}, ${45 + layer.depth * 20}%, ${82 - layer.depth * 30}%)`);
+        g.addColorStop(1, `hsl(215, 50%, ${90 - layer.depth * 25}%)`);
+      } else {
+        g.addColorStop(0, `hsl(214, ${55 + layer.depth * 10}%, ${38 - layer.depth * 18}%)`);
+        g.addColorStop(1, `hsl(220, 50%, ${12 - layer.depth * 4}%)`);
+      }
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      for (let x = 0; x <= w + 8; x += 8) ctx.lineTo(x, ridge(layer, x / w + offset) * h);
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      ctx.fill();
+      // Faint rim light along the crest
+      ctx.strokeStyle = alpha(palette.accent2, light ? 0.25 : 0.12 * (1 + layer.depth));
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x <= w + 8; x += 8) {
+        const y = ridge(layer, x / w + offset) * h;
+        x ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+    });
+
+    // Unfocused wash and status pill
+    if (dim > 0.01) {
+      ctx.fillStyle = light ? `rgba(240, 244, 250, ${0.45 * dim})` : `rgba(4, 8, 16, ${0.5 * dim})`;
+      ctx.fillRect(0, 0, w, h);
+      const label = "Window unfocused  ·  capped at 10 FPS";
+      ctx.font = "500 12px 'DM Mono', monospace";
+      const tw = ctx.measureText(label).width;
+      const bw = tw + 44, bh = 34, bx = (w - bw) / 2, by = h * 0.42 - bh / 2;
+      ctx.globalAlpha = dim;
+      roundRect(ctx, bx, by, bw, bh, 17);
+      ctx.fillStyle = light ? "rgba(255, 255, 255, 0.9)" : "rgba(14, 21, 33, 0.85)";
+      ctx.fill();
+      ctx.strokeStyle = palette.lineStrong;
+      ctx.stroke();
+      ctx.fillStyle = palette.warn;
+      ctx.beginPath(); ctx.arc(bx + 18, by + bh / 2, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = palette.ink;
+      ctx.fillText(label, bx + 30, by + bh / 2 + 4);
       ctx.globalAlpha = 1;
     }
 
-    const blockW = w / (hills.length - 1);
-    ctx.fillStyle = palette.light ? "#4f9a5a" : "#1f4a35";
-    hills.forEach((v, i) => {
-      const top = Math.round((v * h) / 8) * 8;
-      ctx.fillRect(i * blockW, top, blockW + 1, h - top);
+    // Frame timeline: one tick per rendered frame over the last 1.5 seconds
+    const tlH = 38, tlY = h - tlH - 12, tlX = 14, tlW = w - 28;
+    roundRect(ctx, tlX, tlY, tlW, tlH, 10);
+    ctx.fillStyle = light ? "rgba(255, 255, 255, 0.72)" : "rgba(7, 11, 19, 0.62)";
+    ctx.fill();
+    ctx.strokeStyle = palette.line;
+    ctx.stroke();
+    ctx.font = "500 10px 'DM Mono', monospace";
+    ctx.fillStyle = palette.faint;
+    ctx.fillText("FRAMES RENDERED", tlX + 12, tlY + 15);
+    const span = 1.5, innerX = tlX + 12, innerW = tlW - 24;
+    frameLog.forEach((t) => {
+      const age = now - t;
+      if (age > span) return;
+      const x = innerX + innerW * (1 - age / span);
+      ctx.fillStyle = alpha(unfocused ? palette.warn : palette.accent, 0.35 + 0.65 * (1 - age / span));
+      ctx.fillRect(x - 0.75, tlY + 21, 1.5, 10);
     });
-    ctx.fillStyle = palette.light ? "#7a5634" : "#3b2a1c";
-    hills.forEach((v, i) => {
-      const top = Math.round((v * h) / 8) * 8 + 10;
-      ctx.fillRect(i * blockW, top, blockW + 1, h - top);
-    });
-
-    const bob = Math.sin(time * 2) * 3;
-    ctx.fillStyle = palette.ink;
-    ctx.fillRect(w * 0.3, h * 0.62 - 26 + bob, 8, 18);
-
-    if (unfocused) {
-      ctx.fillStyle = alpha("#000000", 0.25);
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "600 13px 'DM Mono', monospace";
-      ctx.fillText("UNFOCUSED · FPS CAPPED", 16, 28);
-    }
 
     demo.stat("window", unfocused ? "Unfocused" : "Focused", unfocused ? "warn" : "good");
-    demo.stat("fps", String(Math.round(fps)));
+    demo.stat("fps", String(fps));
     demo.stat("power", unfocused ? "Low" : "Full", unfocused ? "good" : "");
   });
 }
