@@ -9,7 +9,7 @@ This branch hosts the Chlorine website, deployed via GitHub Pages at the reposit
 - **Benchmarks** — `benchmarks.html`
 - **404** — `404.html`
 
-The current Minecraft 26.3 / Chlorine 1.0.5 release requires Sodium 0.9.2
+The current Minecraft 26.3 / Chlorine 1.0.6 release requires Sodium 0.9.2
 or newer. The site describes the Sodium-aware workload governor, which uses
 Sodium's existing builder queue and worker metrics to protect frame pacing
 under sustained chunk-build pressure. Other companion performance mods remain
