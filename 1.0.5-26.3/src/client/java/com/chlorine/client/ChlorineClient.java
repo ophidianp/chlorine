@@ -43,6 +43,7 @@ public class ChlorineClient implements ClientModInitializer {
             if (client.level != null) {
                 SimulationDistanceSync.publish(client.options.simulationDistance().get());
             }
+            RenderPressure.update(client.getFps(), Chlorine.CONFIG.renderPressureFpsThreshold);
             if (Chlorine.CONFIG.enableSoundBudget || Chlorine.CONFIG.enableParticleBudget) {
                 ClientEffectBudgets.update(
                         client.getFps(),

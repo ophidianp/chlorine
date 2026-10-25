@@ -329,6 +329,70 @@ public final class ChlorineConfigScreenBuilder {
                 .setSaveConsumer(v -> cfg.maxFluidTicksPerTick = v)
                 .build());
 
+        ConfigCategory frameSmoothing = builder.getOrCreateCategory(Component.literal("Frame Smoothing"));
+        frameSmoothing.addEntry(eb.startBooleanToggle(Component.literal("Light update smoothing"), cfg.enableLightUpdateSmoothing)
+                .setTooltip(Component.literal("Spreads large light-update backlogs (flying into new chunks, teleports) over several frames instead of one."))
+                .setSaveConsumer(v -> cfg.enableLightUpdateSmoothing = v)
+                .build());
+        frameSmoothing.addEntry(eb.startDoubleField(Component.literal("Light update budget (ms)"), cfg.lightUpdateBudgetMillis)
+                .setMin(0.25)
+                .setMax(20.0)
+                .setSaveConsumer(v -> cfg.lightUpdateBudgetMillis = v)
+                .build());
+        frameSmoothing.addEntry(eb.startIntField(Component.literal("Min light updates per frame"), cfg.minLightUpdatesPerFrame)
+                .setMin(10)
+                .setSaveConsumer(v -> cfg.minLightUpdatesPerFrame = v)
+                .build());
+        frameSmoothing.addEntry(eb.startBooleanToggle(Component.literal("Autosave smoothing"), cfg.enableAutosaveSmoothing)
+                .setTooltip(Component.literal("Saves only some chunks in the 5-minute autosave tick; vanilla's background saver handles the rest over the next ticks. Shutdown and /save-all still save everything."))
+                .setSaveConsumer(v -> cfg.enableAutosaveSmoothing = v)
+                .build());
+        frameSmoothing.addEntry(eb.startIntField(Component.literal("Chunks saved immediately per autosave"), cfg.autosaveImmediateChunkLimit)
+                .setMin(1)
+                .setSaveConsumer(v -> cfg.autosaveImmediateChunkLimit = v)
+                .build());
+
+        ConfigCategory lod = builder.getOrCreateCategory(Component.literal("Render LOD"));
+        lod.addEntry(eb.startIntSlider(Component.literal("Render pressure FPS threshold"), cfg.renderPressureFpsThreshold, 10, 120)
+                .setTooltip(Component.literal("Below this FPS, ambient effects and block entity LOD kick in. They switch off again 10 FPS above it."))
+                .setSaveConsumer(v -> cfg.renderPressureFpsThreshold = v)
+                .build());
+        lod.addEntry(eb.startBooleanToggle(Component.literal("Adaptive ambient block effects"), cfg.enableAdaptiveAmbientEffects)
+                .setTooltip(Component.literal("Under render pressure, samples fewer blocks per tick for torch flames, drips and leaf particles."))
+                .setSaveConsumer(v -> cfg.enableAdaptiveAmbientEffects = v)
+                .build());
+        lod.addEntry(eb.startDoubleField(Component.literal("Ambient effects scale under pressure"), cfg.ambientEffectsLowFpsScale)
+                .setMin(0.1)
+                .setMax(1.0)
+                .setSaveConsumer(v -> cfg.ambientEffectsLowFpsScale = v)
+                .build());
+        lod.addEntry(eb.startBooleanToggle(Component.literal("Sign text LOD"), cfg.enableSignTextLod)
+                .setTooltip(Component.literal("Skips drawing sign text too far away to read. The sign itself still renders."))
+                .setSaveConsumer(v -> cfg.enableSignTextLod = v)
+                .build());
+        lod.addEntry(eb.startDoubleField(Component.literal("Sign text distance (blocks)"), cfg.signTextRenderDistance)
+                .setMin(4.0)
+                .setMax(64.0)
+                .setSaveConsumer(v -> cfg.signTextRenderDistance = v)
+                .build());
+        lod.addEntry(eb.startBooleanToggle(Component.literal("Dropped item LOD"), cfg.enableItemDropLod)
+                .setTooltip(Component.literal("Draws far-away dropped stacks as one model instead of several copies."))
+                .setSaveConsumer(v -> cfg.enableItemDropLod = v)
+                .build());
+        lod.addEntry(eb.startDoubleField(Component.literal("Dropped item LOD distance (blocks)"), cfg.itemDropLodDistance)
+                .setMin(4.0)
+                .setSaveConsumer(v -> cfg.itemDropLodDistance = v)
+                .build());
+        lod.addEntry(eb.startBooleanToggle(Component.literal("Block entity LOD"), cfg.enableBlockEntityLod)
+                .setTooltip(Component.literal("Under render pressure, stops drawing chests, banners, skulls and similar block entities beyond a shorter distance."))
+                .setSaveConsumer(v -> cfg.enableBlockEntityLod = v)
+                .build());
+        lod.addEntry(eb.startDoubleField(Component.literal("Block entity distance under pressure (blocks)"), cfg.blockEntityLodDistance)
+                .setMin(8.0)
+                .setMax(64.0)
+                .setSaveConsumer(v -> cfg.blockEntityLodDistance = v)
+                .build());
+
         ConfigCategory tickDiagnostics = builder.getOrCreateCategory(Component.literal("Tick Diagnostics"));
         tickDiagnostics.addEntry(eb.startBooleanToggle(Component.literal("Enable tick diagnostics"), cfg.enableTickDiagnostics)
                 .setTooltip(Component.literal("Pure observability, no behavior change — logs a warning if average server tick time creeps above a threshold."))

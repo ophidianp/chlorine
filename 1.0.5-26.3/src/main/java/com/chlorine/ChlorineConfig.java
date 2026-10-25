@@ -247,6 +247,58 @@ public class ChlorineConfig {
     public boolean enableFluidTickGovernor = true;
     public int maxFluidTicksPerTick = 4096;
 
+    // --- Light update smoothing (client) ---
+    // Vanilla drains the whole client light queue in one frame once 1000+
+    // jobs are waiting (elytra flight, teleports, joining a world). That
+    // single frame is a classic 1% low spike. This spreads the backlog over
+    // a per-frame time budget instead. Below 1000 vanilla's path is untouched.
+    public boolean enableLightUpdateSmoothing = true;
+    /** Maximum time spent running queued light updates per call once the backlog is large. */
+    public double lightUpdateBudgetMillis = 2.0;
+    /** Always run at least this many queued light updates per call, so the backlog keeps shrinking. */
+    public int minLightUpdatesPerFrame = 100;
+
+    // --- Render pressure (client) ---
+    // Shared low-FPS signal for the LOD features below. Enters pressure mode
+    // below the threshold and leaves it 10 FPS above, so it doesn't flicker.
+    public int renderPressureFpsThreshold = 35;
+
+    // --- Adaptive ambient block effects (client) ---
+    // Every client tick vanilla samples 1334 random blocks around the player
+    // for torch flames, drips, leaf particles and so on. Under render
+    // pressure this samples fewer blocks.
+    public boolean enableAdaptiveAmbientEffects = true;
+    /** Fraction of the normal sample count used while under render pressure. */
+    public double ambientEffectsLowFpsScale = 0.5;
+
+    // --- Sign text LOD (client) ---
+    public boolean enableSignTextLod = true;
+    /** Sign text further than this many blocks from the camera is not drawn (the sign board still is). */
+    public double signTextRenderDistance = 24.0;
+
+    // --- Dropped item LOD (client) ---
+    // Vanilla draws a stack on the ground as several copies of the model.
+    public boolean enableItemDropLod = true;
+    /** Beyond this many blocks a dropped stack is drawn as a single model. */
+    public double itemDropLodDistance = 16.0;
+
+    // --- Block entity LOD (client) ---
+    // Chests, banners, skulls, beds and other block entities with the normal
+    // 64-block view distance are drawn as full models every frame. Under
+    // render pressure they stop drawing beyond this distance. Long-range
+    // renderers (beacons, end gateways) are left alone.
+    public boolean enableBlockEntityLod = true;
+    public double blockEntityLodDistance = 32.0;
+
+    // --- Autosave smoothing (server/common) ---
+    // Vanilla's 5-minute autosave serializes every changed chunk in a single
+    // tick. This saves only the first N right away and leaves the rest to
+    // vanilla's own background chunk saver (20 per tick). Nothing is skipped:
+    // shutdown, /save-all and unloading chunks still save everything.
+    public boolean enableAutosaveSmoothing = true;
+    /** Chunks saved immediately during an autosave; the rest follow over the next ticks. */
+    public int autosaveImmediateChunkLimit = 32;
+
     // --- Server tick-health diagnostics (server/common) ---
     // Pure observability, no behavior change: periodically logs a warning
     // if average server tick time creeps above a threshold, so slowdowns

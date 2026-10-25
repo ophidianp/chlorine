@@ -8,13 +8,20 @@
     "EntityCollisionCacheMixin",
     "CollisionCacheInvalidationMixin",
     "FluidTickGovernorMixin",
-    "ServerTickFluidResetMixin"
+    "ServerTickFluidResetMixin",
+    "AutosaveWindowMixin",
+    "AutosaveChunkLimitMixin"
   ],
   "client": [
     "client.SoundBudgetMixin",
     "client.ParticleBudgetMixin",
     "client.BeaconBeamThrottleMixin",
-    "client.PortalParticleThrottleMixin"
+    "client.PortalParticleThrottleMixin",
+    "client.LightUpdateSmoothingMixin",
+    "client.AmbientEffectScaleMixin",
+    "client.SignTextLodMixin",
+    "client.ItemDropLodMixin",
+    "client.BlockEntityLodMixin"
   ],
   "injectors": {
     "defaultRequire": 1
