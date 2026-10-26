@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#070b13">
+    <meta name="description" content="How Chlorine was made: written with Claude, directed and tested by one person, with what is verified and what is not.">
+    <title>Transparency — Chlorine</title>
+    <link rel="icon" type="image/png" href="assets/chlorine-icon.png">
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem("chlorine-theme")==="light"?"light":"dark"}catch(e){}</script>
+    <link rel="stylesheet" href="assets/site.css?v=10">
+    <script src="assets/site.js?v=4" defer></script>
+    <script src="assets/chat.js?v=1" defer></script>
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true"><div class="aurora aurora-a"></div><div class="aurora aurora-b"></div></div>
+    <div class="scroll-progress" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Chlorine home"><img src="assets/chlorine-icon.png" alt="" width="30" height="30"><span>Chlorine</span></a>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="features.html">Features</a>
+        <a href="downloads.html">Download</a>
+        <a href="benchmarks.html">Benchmarks</a>
+        <a href="transparency.html" aria-current="page">Transparency</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" aria-label="Switch to light mode">
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <a class="btn btn-primary btn-sm" href="downloads.html">Get Chlorine <span class="arrow" aria-hidden="true">↗</span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu"><span></span></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero wrap">
+        <p class="eyebrow" data-reveal><span class="status-dot"></span> Transparency</p>
+        <h1 class="split">Made with Claude. <span class="grad">Said plainly.</span></h1>
+        <p class="lede" data-reveal style="--d: 300ms">Chlorine was made with Claude, Anthropic's AI, working through Claude Code. I chose what to build, tested it, and decided what shipped. This page says which parts were whose, and how much of it is still unproven.</p>
+      </section>
+
+      <section class="wrap tr-facts" aria-label="At a glance">
+        <div class="cards" data-stagger>
+          <article class="card">
+            <span class="card-tag">WHO WROTE IT</span>
+            <h3>The code came from AI</h3>
+            <p>The mod, its settings screen, this website and its copy were written by AI. The project's README also lists ChatGPT Codex, GitHub Copilot and Nemotron 3.5 super VL as tools used along the way. The chat log below is the <strong>Claude Code</strong> session from 1.0.5 onward, written by <span id="n-opus">Claude Opus 5.5</span> and <span id="n-sonnet">Claude Sonnet 5.5</span>.</p>
+          </article>
+          <article class="card">
+            <span class="card-tag">WHAT I DID</span>
+            <h3>One person steering</h3>
+            <p>I set the direction, picked which ideas to build, and sent the screenshots. I tested the builds in the game on a Ryzen 5 5500 with a Radeon RX 6500 XT, and decided what to keep, rename and release. I attach each jar and publish each release myself. Claude can't see the game, so tuning followed what I reported.</p>
+          </article>
+          <article class="card">
+            <span class="card-tag">NOT PROVEN</span>
+            <h3>What is still unverified</h3>
+            <p>The newest changes (1.0.6 to 1.0.8) have <strong>no controlled frame-time benchmark</strong>. The numbers on the Benchmarks page are sampled readings from recordings on one PC. The demos on this site illustrate the ideas, they are not measurements.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section tr-verify" aria-labelledby="verify-title" style="padding-top: 0">
+        <div class="work">
+          <div class="work-sticky" data-reveal>
+            <p class="eyebrow">Checked and not checked</p>
+            <h2 id="verify-title">What has been tested, and what hasn't.</h2>
+            <p>These are the claims I can stand behind today, and the ones I can't yet.</p>
+          </div>
+          <div class="work-list">
+            <div class="work-item" data-reveal><span class="idx">A</span><div><h3>Builds compile and load</h3><p>Releases are built from a clean state. The 1.0.7 Sodium changes were run in a real client with Sodium 0.9.2, and the patched code was inspected to confirm the hooks landed.</p></div><span class="tag">CHECKED</span></div>
+            <div class="work-item" data-reveal><span class="idx">B</span><div><h3>Only one setup was played</h3><p>Recent testing was on one PC and one version, Minecraft 26.3 with Sodium 0.9.2. Other hardware, other versions and large modpacks have not been tested.</p></div><span class="tag">LIMITED</span></div>
+            <div class="work-item" data-reveal><span class="idx">C</span><div><h3>Frame-rate gains are unmeasured</h3><p>The frame smoothing and Sodium changes are meant to soften hitches. No capture tool such as CapFrameX has been used to measure 1% lows before and after, so no gain is claimed.</p></div><span class="tag">UNPROVEN</span></div>
+            <div class="work-item" data-reveal><span class="idx">D</span><div><h3>The memory governor is new</h3><p>It compiles and ships in 1.0.8, but it has not been played over long sessions or benchmarked. It can't replace Java's garbage collector, which your launcher's JVM flags control.</p></div><span class="tag">NEW</span></div>
+            <div class="work-item" data-reveal><span class="idx">E</span><div><h3>Sodium patches can switch off</h3><p>They target Sodium's internal code, so a Sodium update can make them stop applying. They are written to skip quietly rather than crash, but that means a future update could silently remove their effect.</p></div><span class="tag">FRAGILE</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section tr-based" aria-labelledby="based-title" style="padding-top: 0">
+        <div class="work">
+          <div class="work-sticky" data-reveal>
+            <p class="eyebrow">Where it comes from</p>
+            <h2 id="based-title">Built on other people's work.</h2>
+            <p>Chlorine is not a fork. It is a separate project that leans on these mods and tools, and it is not affiliated with any of them.</p>
+          </div>
+          <div class="work-list">
+            <div class="work-item" data-reveal><span class="idx">A</span><div><h3>Fabric</h3><p>It runs on Fabric Loader and Fabric API, with Mojang's official mappings, and uses Mixin hooks to change game behavior.</p></div><span class="tag">PLATFORM</span></div>
+            <div class="work-item" data-reveal><span class="idx">B</span><div><h3>Cloth Config and Mod Menu</h3><p>The in-game settings screen is built with Cloth Config, which is required. Mod Menu is optional and only adds a Config button to the mod list.</p></div><span class="tag">LIBRARIES</span></div>
+            <div class="work-item" data-reveal><span class="idx">C</span><div><h3>Sodium</h3><p>From 1.0.3 on, Chlorine requires Sodium 0.9.2 or newer and hooks into its chunk renderer. Claude read the compiled Sodium jar to find the hook points. No Sodium source code is copied into this repository, and Sodium is not bundled: you install it yourself. Sodium is licensed under PolyForm Shield 1.0.0 by CaffeineMC.</p></div><span class="tag">REQUIRED</span></div>
+            <div class="work-item" data-reveal><span class="idx">D</span><div><h3>Companion mods</h3><p>It is designed to coexist with Lithium, FerriteCore, EntityCulling, ImmediatelyFast and Iris. None of them is required, and none of their code is in Chlorine.</p></div><span class="tag">OPTIONAL</span></div>
+            <div class="work-item" data-reveal><span class="idx">E</span><div><h3>The licence</h3><p>The repository's LICENSE file is MIT, with the copyright held by ophidianp. Chlorine is not affiliated with Mojang, Microsoft, Anthropic, CaffeineMC or the mods named above.</p></div><span class="tag">MIT</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="chat-section wrap" aria-labelledby="log-title">
+        <div class="chat-intro">
+          <div data-reveal>
+            <p class="eyebrow">The receipts</p>
+            <h2 id="log-title">The conversation itself.</h2>
+          </div>
+          <p data-reveal>From the first message of the Claude Code session to the request for this page. Only what was said in the chat is shown. Tool use is left out, and file paths, local addresses, emails and keys are masked. It reads like a messaging app, but you can't reply.</p>
+        </div>
+
+        <div class="phone">
+          <div class="phone-bar">
+            <img src="assets/chlorine-icon.png" alt="" width="34" height="34">
+            <div><b>Claude Code · Chlorine</b><small id="chat-meta">Loading the conversation…</small></div>
+            <button class="jump" id="chat-jump" type="button">Jump to start</button>
+          </div>
+          <div class="chat" id="chat" role="log" aria-label="Full chat log" tabindex="0">
+            <p class="chat-empty">Loading…</p>
+          </div>
+          <div class="chat-foot" id="chat-foot">Read-only copy of the session. Scroll to read.</div>
+        </div>
+        <p class="chat-fine">Not affiliated with Mojang, Microsoft, CaffeineMC or Anthropic.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer wrap">
+      <div>
+        <a class="brand" href="index.html"><img src="assets/chlorine-icon.png" alt="" width="24" height="24"><span>Chlorine</span></a>
+        <p>Made for the worlds you make.</p>
+      </div>
+      <p>&copy; 2026 Pavan Nemani · MIT Licence</p>
+      <div class="footer-links"><a href="transparency.html">Transparency</a><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></div>
+    </footer>
+  </body>
+</html>
