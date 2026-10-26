@@ -332,6 +332,20 @@ public class ChlorineConfig {
     /** Log a warning if the average tick time (ms) is at or above this. Vanilla's budget per tick is 50ms. */
     public double tickDiagnosticsWarnMs = 55.0;
 
+    // --- Memory governor (client) ---
+    // A mod cannot replace the JVM's garbage collector (that is chosen by
+    // launcher JVM flags). What it can do: drop its own caches when the heap
+    // is nearly full, ask for one collection when leaving a world (the old
+    // world is garbage at that moment and the menu hides the pause), and log
+    // a warning when memory kept after collections keeps growing (a leak).
+    public boolean enableMemoryGovernor = true;
+    /** Heap usage percent at which Chlorine trims its own caches. */
+    public int memoryTrimHeapPercent = 85;
+    /** Request one GC after leaving a world, at most once per minute. */
+    public boolean enableGcOnWorldLeave = true;
+    /** Log a warning when memory retained after GC keeps growing. */
+    public boolean enableLeakWatch = true;
+
     public static ChlorineConfig load() {
         try {
             if (Files.exists(PATH)) {

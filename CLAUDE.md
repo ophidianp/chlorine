@@ -17,7 +17,7 @@ tests every build and wants to learn the code, so explain non-obvious changes.
 ## Mod layout (on main)
 - Version folders: `1.0.0-26.2/` (the last Minecraft 26.2 build),
   `1.0.2-26.3/` (an older 26.3 build, kept for reference) and
-  `1.0.7-26.3/` (the current source; Minecraft 26.3, version 1.0.7). The
+  `1.0.8-26.3/` (the current source; Minecraft 26.3, version 1.0.8). The
   newest folder is named after the release it holds, so rename it when the
   version changes. The release number is `mod_version` in that folder's
   `gradle.properties`; confirm the intended number before tagging.

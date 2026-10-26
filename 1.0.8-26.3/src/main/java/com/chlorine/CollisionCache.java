@@ -37,6 +37,11 @@ public final class CollisionCache {
         ENTRIES.put(entity, new Entry(worldVersion, box, Collections.unmodifiableList(shapes)));
     }
 
+    /** Drops every cached entry; used by the memory governor under heap pressure. */
+    public static synchronized void clear() {
+        ENTRIES.clear();
+    }
+
     public static synchronized void invalidate() {
         worldVersion++;
         if (worldVersion == Long.MAX_VALUE) {

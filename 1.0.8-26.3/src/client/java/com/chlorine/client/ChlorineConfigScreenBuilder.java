@@ -438,6 +438,25 @@ public final class ChlorineConfigScreenBuilder {
                 .setSaveConsumer(v -> cfg.tickDiagnosticsWarnMs = v)
                 .build());
 
+        ConfigCategory memory = builder.getOrCreateCategory(Component.literal("Memory Governor"));
+        memory.addEntry(eb.startBooleanToggle(Component.literal("Enable memory governor"), cfg.enableMemoryGovernor)
+                .setTooltip(Component.literal("Trims Chlorine's own caches when the heap is nearly full. Cannot replace the JVM garbage collector."))
+                .setSaveConsumer(v -> cfg.enableMemoryGovernor = v)
+                .build());
+        memory.addEntry(eb.startIntField(Component.literal("Trim caches at heap usage (%)"), cfg.memoryTrimHeapPercent)
+                .setMin(50)
+                .setMax(98)
+                .setSaveConsumer(v -> cfg.memoryTrimHeapPercent = v)
+                .build());
+        memory.addEntry(eb.startBooleanToggle(Component.literal("Collect garbage after leaving a world"), cfg.enableGcOnWorldLeave)
+                .setTooltip(Component.literal("Requests one GC on a background thread after you leave a world, at most once a minute. Ignored if the JVM runs with -XX:+DisableExplicitGC."))
+                .setSaveConsumer(v -> cfg.enableGcOnWorldLeave = v)
+                .build());
+        memory.addEntry(eb.startBooleanToggle(Component.literal("Leak watch (log only)"), cfg.enableLeakWatch)
+                .setTooltip(Component.literal("Logs a warning if memory kept after garbage collections keeps growing. No behavior change."))
+                .setSaveConsumer(v -> cfg.enableLeakWatch = v)
+                .build());
+
         return builder.build();
     }
 }

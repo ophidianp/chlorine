@@ -5,7 +5,7 @@ Chlorine is a **Fabric performance and power-management mod for Minecraft
 laptop power usage while leaving chunk rendering and renderer internals to
 specialized mods.
 
-Current release: **1.0.7**
+Current release: **1.0.8**
 
 The last version made for Minecraft 26.2 was **1.0.0**.
 
@@ -80,6 +80,18 @@ updates, random ticks, and block updates.
 The 1.0.7 patches change Sodium internals; if a future Sodium version
 changes that code, they switch themselves off instead of crashing the game.
 
+### Memory governor (1.0.8)
+
+Java's garbage collector is chosen by the launcher's JVM flags, so a mod
+cannot replace it. The memory governor works around it instead:
+
+- **Cache trimming:** empties Chlorine's own collision cache when heap usage
+  passes a configurable percentage (default 85%).
+- **GC after leaving a world:** requests one collection on a background
+  thread, at most once a minute. It is ignored under `-XX:+DisableExplicitGC`.
+- **Leak watch:** logs a warning if memory kept after garbage collections
+  keeps growing. It only logs and never changes behavior.
+
 All features are independently configurable and can be disabled without
 removing the mod.
 
@@ -101,7 +113,7 @@ none of those mods is required.
 
 1. Install Fabric Loader for Minecraft 26.3.
 2. Install Fabric API and Cloth Config API.
-3. Place `chlorine-1.0.7.jar` in the instance's `mods` directory.
+3. Place `chlorine-1.0.8.jar` in the instance's `mods` directory.
 4. Optionally install Mod Menu for the in-game configuration screen.
 
 The configuration file is created at:
@@ -129,6 +141,7 @@ The in-game screen groups settings into:
 - Chunk Gen Governor
 - Sound Pre-Cull
 - Tick Diagnostics
+- Memory Governor
 
 Important interactions:
 

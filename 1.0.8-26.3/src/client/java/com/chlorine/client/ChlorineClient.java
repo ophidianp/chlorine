@@ -38,6 +38,7 @@ public class ChlorineClient implements ClientModInitializer {
             }
             SodiumWorkloadGovernor.tick(client);
             SodiumFrameSmoothing.tick(client);
+            MemoryGovernor.tick(client);
             // Runs last so it always gets the final say, regardless of
             // what either system above just tried to set.
             cap.tick(client);
