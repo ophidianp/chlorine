@@ -191,4 +191,4 @@ show authenticity and show some originality that I built this (using AI ig but I
 
 ## License
 
-All Rights Reserved. See [LICENSE](LICENSE).
+MIT Licence. See [LICENSE](LICENSE).

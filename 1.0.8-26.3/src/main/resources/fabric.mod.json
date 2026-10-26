@@ -8,7 +8,7 @@
     "you"
   ],
   "contact": {},
-  "license": "ARR",
+  "license": "MIT",
   "icon": "assets/chlorine/icon.png",
   "environment": "*",
   "entrypoints": {
