@@ -13,7 +13,7 @@ Shared assets: `assets/site.css` (styles and motion), `assets/site.js` (theme,
 navigation, scroll reveals), `assets/demos.js` (the interactive feature demos
 on Home and Features) and `assets/releases.js` (live download data).
 
-The current Minecraft 26.3 / Chlorine 1.0.7 release requires Sodium 0.9.2
+The current Minecraft 26.3 / Chlorine 1.0.8 release requires Sodium 0.9.2
 or newer. The site describes the Sodium-aware workload governor, which uses
 Sodium's existing builder queue and worker metrics to protect frame pacing
 under sustained chunk-build pressure. Other companion performance mods remain

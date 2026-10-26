@@ -158,8 +158,8 @@ function heroScene(canvas) {
   const pointer = pointerOn(canvas, view);
   const readFps = document.querySelector("[data-hero-fps]");
   const readSim = document.querySelector("[data-hero-sim]");
-  const grid = 27;
-  let px = 0, py = 0, radius = 8, targetRadius = 8, phase = 0, fps = 144, lastLabel = 0;
+  const grid = 21;
+  let px = 0, py = 0, radius = 9, targetRadius = 9, phase = 0, fps = 144, lastLabel = 0;
 
   runWhileVisible(canvas, (dt, t) => {
     const { ctx, w, h } = view;
@@ -170,13 +170,13 @@ function heroScene(canvas) {
     // A slow "busy moment" cycle: frames dip, Chlorine trims simulation distance, then recovers.
     phase = (phase + dt / 14) % 1;
     const busy = Math.sin(phase * Math.PI * 2) > 0.35;
-    targetRadius = busy ? 5 : 8;
+    targetRadius = busy ? 6 : 9;
     radius = lerp(radius, targetRadius, 1 - Math.exp(-dt * 0.9));
-    const fpsTarget = busy ? 68 + (8 - radius) * 22 : 144;
+    const fpsTarget = busy ? 68 + (9 - radius) * 18 : 144;
     fps = lerp(fps, fpsTarget, 1 - Math.exp(-dt * 1.6));
 
-    const tx = pointer.active ? clamp(Math.round((pointer.x - ox) / cell - grid / 2 + 0.5), -4, 4) : Math.sin(t * 0.25) * 2.2;
-    const ty = pointer.active ? clamp(Math.round((pointer.y - oy) / cell - grid / 2 + 0.5), -4, 4) : Math.cos(t * 0.19) * 2.2;
+    const tx = pointer.active ? clamp(Math.round((pointer.x - ox) / cell - grid / 2 + 0.5), -3, 3) : Math.sin(t * 0.25) * 2.2;
+    const ty = pointer.active ? clamp(Math.round((pointer.y - oy) / cell - grid / 2 + 0.5), -3, 3) : Math.cos(t * 0.19) * 2.2;
     const follow = 1 - Math.exp(-dt * (pointer.active ? 4 : 0.8));
     px = lerp(px, tx, follow);
     py = lerp(py, ty, follow);
@@ -192,7 +192,7 @@ function heroScene(canvas) {
         const dy = gy + 0.5 - cy;
         const edge = Math.hypot(gx + 0.5 - grid / 2, gy + 0.5 - grid / 2) / (grid / 2);
         if (edge > 1) continue;
-        const fade = 1 - Math.pow(edge, 3);
+        const fade = 1 - Math.pow(edge, 5);
         const cheb = Math.max(Math.abs(dx), Math.abs(dy));
         const inside = cheb <= radius;
         const wave = Math.max(0, 1 - Math.abs(cheb - ripple) / 1.2);
@@ -227,7 +227,7 @@ function heroScene(canvas) {
     if (t - lastLabel > 0.25) {
       lastLabel = t;
       if (readFps) readFps.textContent = `${Math.round(fps)} FPS`;
-      if (readSim) readSim.textContent = `${Math.round(radius * 1.5)} chunks`;
+      if (readSim) readSim.textContent = `${Math.round(radius * 1.33)} chunks`;
     }
   });
 }

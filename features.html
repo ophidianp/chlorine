@@ -8,9 +8,9 @@
     <title>Features — Chlorine</title>
     <link rel="icon" type="image/png" href="assets/chlorine-icon.png">
     <script>try{document.documentElement.dataset.theme=localStorage.getItem("chlorine-theme")==="light"?"light":"dark"}catch(e){}</script>
-    <link rel="stylesheet" href="assets/site.css?v=7">
+    <link rel="stylesheet" href="assets/site.css?v=9">
     <script src="assets/site.js?v=4" defer></script>
-    <script src="assets/demos.js?v=4" defer></script>
+    <script src="assets/demos.js?v=5" defer></script>
   </head>
   <body>
     <div class="backdrop" aria-hidden="true"><div class="aurora aurora-a"></div><div class="aurora aurora-b"></div></div>
@@ -48,6 +48,7 @@
           <a href="#comfort">Effects &amp; power</a>
           <a href="#frames">Frame smoothing &amp; LOD</a>
           <a href="#sodium">Sodium integration</a>
+          <a href="#memory">Memory</a>
           <a href="#config">Configuration</a>
         </nav>
 
@@ -121,13 +122,23 @@
             <p class="feature-note" data-reveal>This integration is designed for Chlorine 1.0.3+ on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
           </article>
 
+          <article class="feature-block" id="memory">
+            <div class="feature-block-head" data-reveal><span class="idx">06</span><div><p class="eyebrow">Keep the heap healthy <span class="new-badge">NEW IN 1.0.8</span></p><h2>Memory governor</h2></div></div>
+            <div class="feature-items" data-stagger>
+              <div class="feature-item"><strong>Cache trimming</strong><span>Empties Chlorine's own collision cache when heap usage passes a configurable percentage, 85% by default.</span></div>
+              <div class="feature-item"><strong>GC after leaving a world</strong><span>Requests one garbage collection on a background thread after you leave a world, at most once a minute, so the menu never freezes. Ignored if the JVM runs with <code>-XX:+DisableExplicitGC</code>.</span></div>
+              <div class="feature-item"><strong>Leak watch</strong><span>Logs a warning if memory kept after garbage collections keeps growing. It only logs and never changes behavior.</span></div>
+            </div>
+            <p class="feature-note" data-reveal>Java's garbage collector is chosen by your launcher's JVM flags, so a mod cannot replace it. For the biggest memory-related gains, use G1 or Generational ZGC with 6 to 8 GB allocated.</p>
+          </article>
+
           <article class="feature-block" id="config">
-            <div class="feature-block-head" data-reveal><span class="idx">06</span><div><p class="eyebrow">Choose what stays on</p><h2>Your configuration</h2></div></div>
+            <div class="feature-block-head" data-reveal><span class="idx">07</span><div><p class="eyebrow">Choose what stays on</p><h2>Your configuration</h2></div></div>
             <div data-reveal>
               <p class="lede" style="max-width: 60ch">All features are independently configurable and can be disabled without removing the mod. Configure them in-game with Cloth Config, optionally surfaced through Mod Menu, or edit <code>config/chlorine.json</code> directly.</p>
               <div class="chips" style="margin: 30px 0">
-                <span class="chip">Simulation Distance Cap</span><span class="chip">Adaptive Scaler</span><span class="chip">Power Saver</span><span class="chip">Mob AI Throttle</span><span class="chip">Item Merging</span><span class="chip">XP Orb Merging</span><span class="chip">Sound Budget</span><span class="chip">Particle Budget</span><span class="chip">Low-End Auto-Tune</span><span class="chip">Beacon &amp; Portal Throttle</span><span class="chip">Chunk Gen Governor</span><span class="chip">Sound Pre-Cull</span><span class="chip req">Frame Smoothing</span><span class="chip req">Render LOD</span><span class="chip req">Sodium Workload Governors</span><span class="chip">Sodium GPU Profile</span><span class="chip">Tick Diagnostics</span>
-                <small>The in-game config screen groups settings into these categories · highlighted ones are new or expanded in 1.0.6 and 1.0.7</small>
+                <span class="chip">Simulation Distance Cap</span><span class="chip">Adaptive Scaler</span><span class="chip">Power Saver</span><span class="chip">Mob AI Throttle</span><span class="chip">Item Merging</span><span class="chip">XP Orb Merging</span><span class="chip">Sound Budget</span><span class="chip">Particle Budget</span><span class="chip">Low-End Auto-Tune</span><span class="chip">Beacon &amp; Portal Throttle</span><span class="chip">Chunk Gen Governor</span><span class="chip">Sound Pre-Cull</span><span class="chip req">Frame Smoothing</span><span class="chip req">Render LOD</span><span class="chip req">Sodium Workload Governors</span><span class="chip">Sodium GPU Profile</span><span class="chip">Tick Diagnostics</span><span class="chip req">Memory Governor</span>
+                <small>The in-game config screen groups settings into these categories · highlighted ones are new or expanded in 1.0.6, 1.0.7 and 1.0.8</small>
               </div>
               <p style="color: var(--muted)">Chlorine 1.0.3+ requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
             </div>
