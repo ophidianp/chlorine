@@ -238,3 +238,5 @@ to implement them. Now, this isnt a promise, but I want to learn how to code mys
 
 All Rights Reserved (ARR). Copyright (c) 2026 Pavan Nemani.
 This project is not open source; see [LICENSE](LICENSE) for what you may and may not do.
+
+The 0.1.x public beta releases are the exception: they were released under the MIT License, which is included in those jars.
