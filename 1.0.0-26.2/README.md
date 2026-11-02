@@ -192,4 +192,5 @@ show authenticity and show some originality that I built this (using AI ig but I
 
 ## License
 
-MIT Licence. See [LICENSE](LICENSE).
+All Rights Reserved (ARR). Copyright (c) 2026 Pavan Nemani.
+This project is not open source; see [LICENSE](LICENSE) for what you may and may not do.
