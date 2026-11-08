@@ -213,3 +213,21 @@ document.querySelectorAll(".lab").forEach((lab) => {
     });
   });
 });
+
+/* ---------- Liquid glass: refraction + chromatic aberration (Chromium), glare, gliding lens (assets/liquid-glass.js) ---------- */
+(() => {
+  const LG = window.LiquidGlass;
+  if (!LG) return;
+  // Strongest glass first: only the first 25 get the lens filter, the rest stay blur-only (keeps the GPU cool).
+  const tiers = [
+    [".site-header, .hero-readout", 70],
+    [".release-panel, .version-picker, .demo, .callout", 55],
+    [".card, .result, .feature-item, .chips", 50],
+    [".btn-ghost, .theme-toggle, .menu-toggle, .chip", 44],
+  ];
+  for (const [sel, s] of tiers) document.querySelectorAll(sel).forEach((el) => LG.glassify(el, s));
+  document.querySelectorAll(".release-panel, .demo, .callout").forEach((el) => el.classList.add("lg-strong"));
+  LG.init({ max: 25 });
+  document.querySelectorAll(".lab-tabs").forEach((c) => LG.attachLens(c, ".lab-tab"));
+  menuToggle?.addEventListener("click", () => { if (siteNav?.classList.contains("is-open")) LG.morphFrom(menuToggle, siteNav, 520); });
+})();
