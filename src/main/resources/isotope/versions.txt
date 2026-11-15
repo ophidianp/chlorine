@@ -1,0 +1,5 @@
+# Game versions Isotope has redirect tables for, oldest first.
+# Extra ids on a line are other versions that use the same tables.
+26.1.2 26.1 26.1.1
+26.2
+26.3

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "isotope",
+  "version": "${version}",
+  "name": "Isotope",
+  "description": "Runs Fabric mods built for a different Minecraft 26.x version. Rewrites their bytecode, mixins and metadata to match the game you are running, and tells you up front what could not be bridged.",
+  "authors": [
+    "ophidianp"
+  ],
+  "contact": {
+    "sources": "https://github.com/ophidianp/chlorine/tree/isotope"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/isotope/icon.png",
+  "environment": "*",
+  "languageAdapters": {
+    "isotope": "com.isotope.boot.IsotopeAdapter"
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": ">=26.1",
+    "java": ">=25"
+  }
+}
