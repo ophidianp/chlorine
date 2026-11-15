@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Isotope: flat violet tile, white glyph. Same recipe as Chlorine's icon
+       (pastel tile + one white symbol), different hue. -->
+  <rect width="128" height="128" fill="#B79CF0"/>
+  <g fill="none" stroke="#FEFEFE" stroke-width="6" stroke-linecap="round">
+    <ellipse cx="64" cy="64" rx="48" ry="19" transform="rotate(-32 64 64)"/>
+    <ellipse cx="64" cy="64" rx="48" ry="19" transform="rotate(32 64 64)"/>
+  </g>
+  <!-- Nucleus: one solid particle plus one hollow "extra neutron" - the thing
+       that makes an isotope an isotope. -->
+  <circle cx="53" cy="64" r="10.5" fill="#FEFEFE"/>
+  <circle cx="76" cy="64" r="8" fill="#B79CF0" stroke="#FEFEFE" stroke-width="5"/>
+  <!-- Electrons -->
+  <circle cx="23.3" cy="89.4" r="6.5" fill="#FEFEFE"/>
+  <circle cx="104.7" cy="38.6" r="6.5" fill="#FEFEFE"/>
+</svg>

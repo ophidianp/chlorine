@@ -1,0 +1,30 @@
+# gradle
+.gradle/
+build/
+out/
+classes/
+
+# ide
+.idea/
+*.iml
+*.ipr
+*.iws
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+*.launch
+
+# macos
+*.DS_Store
+
+# local game data and downloaded game jars (never commit Mojang's jars)
+run/
+work/
+
+# java
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
