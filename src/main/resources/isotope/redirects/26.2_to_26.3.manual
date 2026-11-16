@@ -1,0 +1,31 @@
+isotope-redirects 1
+# Hand-written rules for 26.2 -> 26.3, merged into the generated table at load time.
+# Every line was checked with javap against both client jars. Read CLAUDE.md first.
+from 26.2
+to 26.3
+
+# 26.3 removed the per-block codec system. In 26.2, BlockBehaviour declared simpleCodec(),
+# propertiesCodec() and codec(), Block declared CODEC, and every block class had its own
+# CODEC field. In 26.3 none of these exist, and no game code asks a block for a codec.
+# Old mods still build one in a static initializer (CODEC = simpleCodec(MyBlock::new)), so
+# the class dies with NoSuchMethodError before anything else runs. They get null instead:
+# the only reader of that value was the game, which no longer reads it.
+# A mod's OWN CODEC field is left alone (the lookup stops at a class that declares it).
+# propertiesCodec() is deliberately NOT stubbed: its result is fed into RecordCodecBuilder
+# by the mod, which would fail on null in a less obvious way.
+s m net/minecraft/world/level/block/state/BlockBehaviour simpleCodec (Ljava/util/function/Function;)Lcom/mojang/serialization/MapCodec; per-block codecs were removed in 26.3
+s f net/minecraft/world/level/block/Block CODEC Lcom/mojang/serialization/MapCodec; per-block codecs were removed in 26.3
+
+# PushReaction: every constant was renamed AND the order changed, so matching by position
+# would be wrong (it would turn DESTROY into PUSH). Mapping proven by usage: the same vanilla
+# block / entity uses the old constant in 26.2 and the new one in 26.3.
+#   DESTROY  -> POPPED         201 of 201 blocks in Blocks
+#   BLOCK    -> IMMOVEABLE     11 of 11 blocks in Blocks
+#   NORMAL   -> PUSH_PULL      Entity, BlockBehaviour$Properties default, PistonBaseBlock
+#   IGNORE   -> IGNORE_ENTITY  8 of 8 classes (ArmorStand, Marker, Display, ...)
+#   PUSH_ONLY-> PUSH           the remaining constant; the one PUSH in Blocks
+f net/minecraft/world/level/material/PushReaction DESTROY Lnet/minecraft/world/level/material/PushReaction; POPPED
+f net/minecraft/world/level/material/PushReaction BLOCK Lnet/minecraft/world/level/material/PushReaction; IMMOVEABLE
+f net/minecraft/world/level/material/PushReaction NORMAL Lnet/minecraft/world/level/material/PushReaction; PUSH_PULL
+f net/minecraft/world/level/material/PushReaction IGNORE Lnet/minecraft/world/level/material/PushReaction; IGNORE_ENTITY
+f net/minecraft/world/level/material/PushReaction PUSH_ONLY Lnet/minecraft/world/level/material/PushReaction; PUSH

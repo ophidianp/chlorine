@@ -98,6 +98,15 @@ public final class VersionGraph {
 				t = RedirectTable.read(r);
 			}
 
+			// Hand-written additions live in their own file so regenerating the table never loses them.
+			InputStream manual = VersionGraph.class.getResourceAsStream("/isotope/redirects/" + key + ".manual");
+
+			if (manual != null) {
+				try (BufferedReader r = new BufferedReader(new InputStreamReader(manual, StandardCharsets.UTF_8))) {
+					t.readInto(r);
+				}
+			}
+
 			tables.put(key, t);
 		}
 

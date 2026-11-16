@@ -56,13 +56,15 @@ public final class JarRewriter {
 		/** Set when the user put the jar in a version-named folder; overrides detection. */
 		public String forcedSource;
 		public boolean lenientMixins = true;
+		/** True on a dedicated server, where the game's client classes are absent on purpose. */
+		public boolean dedicatedServer;
 		public VersionGraph graph;
 		public LiveIndex index;
 		/**
 		 * Given the mod's {@code depends.minecraft} value (String, List or null), returns the known
-		 * version it was built for, or null if that cannot be told.
+		 * versions it allows, oldest first. The pick among them is made from the bytecode.
 		 */
-		public Function<Object, String> sourceDetector = o -> null;
+		public Function<Object, List<String>> allowedVersions;
 		public String isotopeVersion = "dev";
 	}
 
@@ -92,7 +94,13 @@ public final class JarRewriter {
 
 		// --- which version is this mod from?
 		Object mcDep = dependsOn(root.json, "minecraft");
-		String source = o.forcedSource != null ? o.forcedSource : o.sourceDetector.apply(mcDep);
+		String source = o.forcedSource;
+
+		if (source == null) {
+			List<String> allowed = o.allowedVersions != null ? o.allowedVersions.apply(mcDep) : new ArrayList<>(o.graph.known());
+			source = detectSource(units, allowed, o.graph, report);
+		}
+
 		String target = o.targetVersion;
 		report.toVersion = o.targetLabel != null ? o.targetLabel : String.valueOf(target);
 
@@ -128,7 +136,7 @@ public final class JarRewriter {
 						if (!isClass(e.getKey())) continue;
 
 						try {
-							byte[] out = ClassRewriter.rewrite(e.getValue(), hop, changes);
+							byte[] out = ClassRewriter.rewrite(e.getValue(), hop, changes, report.stubs);
 
 							if (out != e.getValue()) {
 								e.setValue(out);
@@ -166,8 +174,22 @@ public final class JarRewriter {
 			}
 		}
 
+		// Multi-release jars keep newer builds of a class under META-INF/versions/<java>/. The JVM
+		// (Java 25 here) picks the highest one, so the check must look at that copy too.
+		for (int java = 9; java <= 25; java++) {
+			String prefix = "META-INF/versions/" + java + "/";
+
+			for (Unit u : units) {
+				for (Map.Entry<String, byte[]> e : u.entries.entrySet()) {
+					if (isClass(e.getKey()) && e.getKey().startsWith(prefix)) {
+						ownClasses.put(e.getKey().substring(prefix.length(), e.getKey().length() - 6), e.getValue());
+					}
+				}
+			}
+		}
+
 		LiveIndex index = o.index.withFirst(ownClasses::get);
-		Linker linker = new Linker(index, report);
+		Linker linker = new Linker(index, report, o.dedicatedServer);
 		Set<String> deadMixins = new HashSet<>();
 
 		for (Unit u : units) {
@@ -180,8 +202,11 @@ public final class JarRewriter {
 					ModClass mc = ModClass.scan(e.getValue());
 
 					if (mc.isMixin()) {
-						List<String> present = MixinCheck.check(e.getValue(), index, report);
-						boolean allGame = mc.mixinTargets.stream().allMatch(Linker::isGameName);
+						List<String> present = MixinCheck.check(e.getValue(), index, report, o.dedicatedServer);
+						// On a server, a mixin into a client class is simply not for this side; the mod's
+						// own config already keeps it in the "client" list, so leave it alone.
+						boolean allGame = mc.mixinTargets.stream().allMatch(t -> Linker.isGameName(t)
+								&& !(o.dedicatedServer && Linker.isClientOnly(t)));
 						if (present.isEmpty() && allGame) deadMixins.add(mc.name);
 						if (o.lenientMixins) e.setValue(relaxRequire(e.getValue()));
 					}
@@ -190,6 +215,15 @@ public final class JarRewriter {
 				}
 			}
 		}
+
+		// --- what certainly runs at startup
+		List<String> entrypoints = new ArrayList<>();
+
+		for (Unit u : units) {
+			if (u.json != null) collectEntrypoints(u.json, o.dedicatedServer, entrypoints);
+		}
+
+		report.startup.putAll(com.isotope.link.StartupPath.find(ownClasses, entrypoints, linker.problemsByMethod, !o.dedicatedServer));
 
 		// --- metadata
 		for (Unit u : units) {
@@ -216,6 +250,68 @@ public final class JarRewriter {
 		}
 
 		return result;
+	}
+
+	// ---------------------------------------------------------------- which version is it from
+
+	/**
+	 * Picks the version the mod was compiled against, from evidence: every game class the
+	 * bytecode names is looked up in each candidate version's class list, and the version
+	 * missing the fewest of them wins. Hundreds of classes move or vanish between
+	 * releases, so a mod that touches any of them gives itself away. A tie (the mod only
+	 * uses classes every candidate has) goes to the oldest candidate: authors set the
+	 * minimum to what they built against, and for a tie it makes no difference anyway.
+	 */
+	private static String detectSource(List<Unit> units, List<String> allowed, VersionGraph graph, Report report) throws IOException {
+		if (allowed.isEmpty()) return null;
+		if (allowed.size() == 1) return allowed.get(0);
+		java.util.Set<String> referenced = new java.util.HashSet<>();
+		java.util.Set<String> own = new java.util.HashSet<>();
+
+		for (Unit u : units) {
+			for (Map.Entry<String, byte[]> e : u.entries.entrySet()) {
+				if (!isClass(e.getKey())) continue;
+
+				try {
+					ClassReader r = new ClassReader(e.getValue());
+					own.add(r.getClassName());
+					char[] buf = new char[r.getMaxStringLength()];
+
+					// Every class a class file refers to sits in its constant pool as a CONSTANT_Class entry (tag 7).
+					for (int i = 1; i < r.getItemCount(); i++) {
+						int offset = r.getItem(i);
+						if (offset == 0 || r.b[offset - 1] != 7) continue;
+						String name = r.readUTF8(offset, buf);
+						while (name.startsWith("[")) name = name.substring(1);
+						if (name.startsWith("L") && name.endsWith(";")) name = name.substring(1, name.length() - 1);
+						if (name.startsWith("net/minecraft/") || name.startsWith("com/mojang/blaze3d/") || name.startsWith("com/mojang/renderpearl/")) referenced.add(name);
+					}
+				} catch (RuntimeException ex) {
+					// an unreadable class contributes no evidence
+				}
+			}
+		}
+
+		referenced.removeAll(own); // a mixin into a class the mod itself ships proves nothing
+		String best = null;
+		int bestMissing = Integer.MAX_VALUE;
+		StringBuilder evidence = new StringBuilder();
+
+		for (String v : allowed) {
+			com.isotope.model.Hierarchy h = graph.hierarchy(v);
+			int missing = 0;
+			for (String c : referenced) if (!h.contains(c)) missing++;
+			if (evidence.length() > 0) evidence.append(", ");
+			evidence.append(v).append(": ").append(missing).append(" missing");
+
+			if (missing < bestMissing) { // strict: ties keep the older version
+				bestMissing = missing;
+				best = v;
+			}
+		}
+
+		report.notes.add("detected as a " + best + " mod from the " + referenced.size() + " game classes it uses (" + evidence + ")");
+		return best;
 	}
 
 	// ---------------------------------------------------------------- loading
@@ -273,6 +369,33 @@ public final class JarRewriter {
 	@SuppressWarnings("unchecked")
 	private static Object dependsOn(Map<String, Object> json, String id) {
 		return json.get("depends") instanceof Map<?, ?> deps ? ((Map<String, Object>) deps).get(id) : null;
+	}
+
+	/**
+	 * Classes named by the entrypoints that certainly run at startup on this side: Fabric's own
+	 * {@code main}, {@code preLaunch} and {@code server}/{@code client}, plus init-style keys of
+	 * entrypoint libraries ({@code yumi:init}, {@code yumi:dedicated_server_init}, ...). Keys for
+	 * integrations ({@code modmenu}, {@code jei_mod_plugin}) only run if that other mod is present,
+	 * so they are left out.
+	 */
+	@SuppressWarnings("unchecked")
+	private static void collectEntrypoints(Map<String, Object> json, boolean server, List<String> out) {
+		if (!(json.get("entrypoints") instanceof Map<?, ?> eps)) return;
+
+		for (String key : ((Map<String, Object>) eps).keySet()) {
+			String k = key.toLowerCase(java.util.Locale.ROOT);
+			boolean fabric = k.equals("main") || k.equals("prelaunch") || k.equals(server ? "server" : "client");
+			boolean initStyle = k.endsWith("init") && !(server ? k.contains("client") : k.contains("server"));
+			if (!fabric && !initStyle) continue;
+			if (!(((Map<String, Object>) eps).get(key) instanceof List<?> list)) continue;
+
+			for (Object e : list) {
+				String value = e instanceof String str ? str : e instanceof Map<?, ?> m && ((Map<String, Object>) m).get("value") instanceof String v ? v : null;
+				if (value == null) continue;
+				int colons = value.indexOf("::");
+				out.add((colons >= 0 ? value.substring(0, colons) : value).replace('.', '/'));
+			}
+		}
 	}
 
 	// ---------------------------------------------------------------- patching

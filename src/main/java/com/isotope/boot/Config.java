@@ -12,6 +12,7 @@ final class Config {
 	boolean enabled = true;
 	boolean lenientMixins = true;
 	boolean cache = true;
+	boolean loadFatal = false;
 
 	private static final String DEFAULTS = """
 			# Isotope settings. Delete this file to get the defaults back.
@@ -23,6 +24,14 @@ final class Config {
 			#   true  = skip that one hook and keep going (the feature behind it will not work)
 			#   false = let Mixin treat it as fatal, exactly as it would for a normal mod
 			lenient-mixins=true
+
+			# Some mods contain a class the JVM will refuse to load on this game version, because
+			# the game class it extends became final, sealed or an interface. That throws as soon
+			# as the class is touched, often while the game starts. The report lists these as
+			# "class changed shape".
+			#   false = do not load such a mod at all (and anything that needs it)
+			#   true  = load it anyway, for testing; expect a crash
+			load-mods-with-fatal-problems=false
 
 			# Reuse the rewritten jars from the last launch when nothing changed.
 			# Turn off only when debugging Isotope itself.
@@ -48,6 +57,7 @@ final class Config {
 			c.enabled = bool(p, "enabled", true);
 			c.lenientMixins = bool(p, "lenient-mixins", true);
 			c.cache = bool(p, "cache", true);
+			c.loadFatal = bool(p, "load-mods-with-fatal-problems", false);
 		} catch (IOException e) {
 			IsotopeLog.warn("could not read " + file + " (" + e + "); using defaults");
 		}

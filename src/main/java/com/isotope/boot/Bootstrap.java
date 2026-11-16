@@ -77,73 +77,104 @@ final class Bootstrap {
 					+ "). Mods will be checked and loaded, but nothing can be redirected.");
 		}
 
-		LiveIndex index = LoaderBridge.liveIndex();
 		List<LoaderBridge.Candidate> candidates = new ArrayList<>();
 		StringBuilder reportText = new StringBuilder();
 		reportText.append("Isotope ").append(isotopeVersion).append(" on Minecraft ").append(running).append("\n")
 				.append("This file is rewritten on every launch. 'used in' lists the mod's classes that would hit the problem.\n\n");
 		Set<Path> liveCacheDirs = new HashSet<>();
 
-		for (Input in : inputs) {
-			String label = modsDir.relativize(in.jar()).toString();
+		try (LoaderBridge.Libraries libraries = new LoaderBridge.Libraries()) {
+			LiveIndex index = LoaderBridge.liveIndex(libraries);
 
-			try {
-				byte[] bytes = Files.readAllBytes(in.jar());
-				String key = hash(bytes, isotopeVersion + "|" + running + "|" + config.lenientMixins + "|" + in.forcedVersion());
-				Path outDir = cacheDir.resolve(stripJar(in.jar().getFileName().toString()) + "-" + key);
-				Path done = outDir.resolve("isotope.done");
-				liveCacheDirs.add(outDir);
-				List<Path> jars = new ArrayList<>();
+			for (Input in : inputs) {
+				String label = modsDir.relativize(in.jar()).toString();
 
-				if (config.cache && Files.exists(done)) {
-					for (String name : Files.readAllLines(done, StandardCharsets.UTF_8)) {
-						if (name.startsWith("summary: ")) IsotopeLog.info(name.substring(9) + "  (cached)");
-						else if (!name.isBlank()) jars.add(outDir.resolve(name));
+				try {
+					byte[] bytes = Files.readAllBytes(in.jar());
+					String key = hash(bytes, isotopeVersion + "|" + running + "|" + config.lenientMixins + "|" + in.forcedVersion()
+							+ "|" + loader.getEnvironmentType());
+					Path outDir = cacheDir.resolve(stripJar(in.jar().getFileName().toString()) + "-" + key);
+					Path done = outDir.resolve("isotope.done");
+					liveCacheDirs.add(outDir);
+					List<Path> jars = new ArrayList<>();
+
+					boolean fatal = false;
+					String fatalReason = "";
+					String modName = label;
+
+					if (config.cache && Files.exists(done)) {
+						for (String name : Files.readAllLines(done, StandardCharsets.UTF_8)) {
+							if (name.startsWith("summary: ")) IsotopeLog.info(name.substring(9) + "  (cached)");
+							else if (name.startsWith("fatal: ")) {
+								fatal = true;
+								fatalReason = name.substring(7);
+							}
+							else if (name.startsWith("mod: ")) modName = name.substring(5);
+							else if (!name.isBlank()) jars.add(outDir.resolve(name));
+						}
+
+						reportText.append(Files.readString(outDir.resolve("report.txt"), StandardCharsets.UTF_8));
+					} else {
+						deleteTree(outDir);
+						JarRewriter.Options o = new JarRewriter.Options();
+						o.graph = graph;
+						o.index = index;
+						o.targetVersion = target;
+						o.targetLabel = running;
+						o.forcedSource = in.forcedVersion();
+						o.lenientMixins = config.lenientMixins;
+						o.dedicatedServer = loader.getEnvironmentType() == net.fabricmc.api.EnvType.SERVER;
+						o.isotopeVersion = isotopeVersion;
+						o.allowedVersions = VersionDetect.allowedVersions(graph);
+						JarRewriter.Result result = JarRewriter.rewrite(in.jar(), outDir, o);
+						jars.addAll(result.jars);
+						String rendered = result.report.render();
+						Files.writeString(outDir.resolve("report.txt"), rendered, StandardCharsets.UTF_8);
+						fatal = result.report.hasFatal();
+						modName = result.report.modId;
+						List<String> marker = new ArrayList<>();
+						for (Path j : jars) marker.add(j.getFileName().toString());
+						marker.add("summary: " + result.report.oneLine());
+						marker.add("mod: " + modName);
+						if (fatal) {
+							fatalReason = result.report.fatalReason();
+							marker.add("fatal: " + fatalReason);
+						}
+						Files.write(done, marker, StandardCharsets.UTF_8); // written last: marks the folder complete
+						reportText.append(rendered);
+						IsotopeLog.info(result.report.oneLine());
 					}
 
-					reportText.append(Files.readString(outDir.resolve("report.txt"), StandardCharsets.UTF_8));
-				} else {
-					deleteTree(outDir);
-					JarRewriter.Options o = new JarRewriter.Options();
-					o.graph = graph;
-					o.index = index;
-					o.targetVersion = target;
-					o.targetLabel = running;
-					o.forcedSource = in.forcedVersion();
-					o.lenientMixins = config.lenientMixins;
-					o.isotopeVersion = isotopeVersion;
-					o.sourceDetector = LoaderBridge.sourceDetector(graph, target);
-					JarRewriter.Result result = JarRewriter.rewrite(in.jar(), outDir, o);
-					jars.addAll(result.jars);
-					String rendered = result.report.render();
-					Files.writeString(outDir.resolve("report.txt"), rendered, StandardCharsets.UTF_8);
-					List<String> marker = new ArrayList<>();
-					for (Path j : jars) marker.add(j.getFileName().toString());
-					marker.add("summary: " + result.report.oneLine());
-					Files.write(done, marker, StandardCharsets.UTF_8); // written last: marks the folder complete
-					reportText.append(rendered);
-					IsotopeLog.info(result.report.oneLine());
-				}
+					if (fatal && !config.loadFatal) {
+						String why = modName + ": NOT LOADED on Minecraft " + running + ", " + fatalReason
+								+ ". Set load-mods-with-fatal-problems=true in config/isotope.properties to try anyway.";
+						IsotopeLog.warn(why);
+						reportText.append("   ").append(why).append("\n\n");
+						continue;
+					}
 
-				for (Path jar : jars) candidates.add(LoaderBridge.readCandidate(jar));
-			} catch (Throwable t) {
-				IsotopeLog.error("could not process " + label + "; it will not be loaded", t);
-				reportText.append("== ").append(label).append("\n   FAILED: ").append(t).append("\n\n");
+					for (Path jar : jars) candidates.add(LoaderBridge.readCandidate(jar));
+				} catch (Throwable t) {
+					IsotopeLog.error("could not process " + label + "; it will not be loaded", t);
+					reportText.append("== ").append(label).append("\n   FAILED: ").append(t).append("\n\n");
+				}
 			}
-		}
+		} // libraries closed here: no jar handles are left open while the game runs
 
 		List<String> messages = new ArrayList<>();
 		List<LoaderBridge.Candidate> accepted = LoaderBridge.resolve(candidates, messages);
 		for (String m : messages) IsotopeLog.info(m);
-		LoaderBridge.inject(accepted);
 
 		if (!messages.isEmpty()) {
 			reportText.append("Loading decisions:\n");
 			for (String m : messages) reportText.append("   ").append(m).append('\n');
 		}
 
+		// Write the report before handing mods to the loader: adding a mod can run that mod's own
+		// early code, and if it stops the game the report must already be on disk.
 		Files.writeString(base.resolve("report.txt"), reportText.toString(), StandardCharsets.UTF_8);
 		cleanCache(cacheDir, liveCacheDirs);
+		LoaderBridge.inject(accepted);
 		List<String> ids = new ArrayList<>();
 		for (LoaderBridge.Candidate c : accepted) ids.add(c.meta().getId() + " " + c.meta().getVersion().getFriendlyString());
 		IsotopeLog.info("added " + accepted.size() + " mod" + (accepted.size() == 1 ? "" : "s") + " in "

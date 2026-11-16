@@ -113,6 +113,38 @@ public final class Hop {
 		return null;
 	}
 
+	/**
+	 * The stub that applies to a use of {@code owner.name desc}, or null. Climbs the hierarchy like
+	 * {@link #resolveMethod}, but stops at a mod class that declares the member itself: a mod's
+	 * own {@code CODEC} field is a real field, not the game's removed one.
+	 */
+	public RedirectTable.Stub resolveStub(boolean field, String owner, String name, String desc) {
+		if (!table.hasStubs() || owner.isEmpty() || owner.charAt(0) == '[') return null;
+		return walkStub(field, owner, name, desc, new HashSet<>());
+	}
+
+	private RedirectTable.Stub walkStub(boolean field, String cls, String name, String desc, Set<String> seen) {
+		if (cls == null || !seen.add(cls)) return null;
+		RedirectTable.Stub stub = table.stub(field, cls, name, desc);
+		if (stub != null) return stub;
+		ModClass mod = modClasses.get(cls);
+
+		if (mod != null) {
+			if (mod.declared.contains(field ? name + ':' + desc : name + desc)) return null;
+			RedirectTable.Stub r = walkStub(field, mod.superName, name, desc, seen);
+			if (r != null) return r;
+			for (String i : mod.interfaces) if ((r = walkStub(field, i, name, desc, seen)) != null) return r;
+			return null;
+		}
+
+		Hierarchy.Node node = oldHierarchy.get(cls);
+		if (node == null) return null;
+		RedirectTable.Stub r = walkStub(field, node.superName(), name, desc, seen);
+		if (r != null) return r;
+		for (String i : node.interfaces()) if ((r = walkStub(field, i, name, desc, seen)) != null) return r;
+		return null;
+	}
+
 	/** Maps every {@code Lsome/Class;} in a descriptor to this hop's new names. */
 	public String mapDesc(String desc) {
 		if (desc.indexOf('L') < 0) return desc;

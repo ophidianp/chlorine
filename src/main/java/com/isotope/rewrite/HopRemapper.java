@@ -32,10 +32,39 @@ public final class HopRemapper extends ClassRemapper {
 	/** Counts what was changed, for the report. */
 	public final int[] changes;
 
+	/** Descriptions of the stubs that were applied, for the report (may be null). */
+	private final java.util.Set<String> stubsUsed;
+
 	public HopRemapper(ClassVisitor downstream, Hop hop, int[] changes) {
+		this(downstream, hop, changes, null);
+	}
+
+	public HopRemapper(ClassVisitor downstream, Hop hop, int[] changes, java.util.Set<String> stubsUsed) {
 		super(Opcodes.ASM9, downstream, new Names(hop, changes));
 		this.hop = hop;
 		this.changes = changes;
+		this.stubsUsed = stubsUsed;
+	}
+
+	/** Pushes the "nothing" value of a type: null, 0, 0L, 0f, 0d, or nothing for void. */
+	private static void pushDefault(MethodVisitor mv, Type t) {
+		switch (t.getSort()) {
+		case Type.VOID -> { }
+		case Type.LONG -> mv.visitInsn(Opcodes.LCONST_0);
+		case Type.FLOAT -> mv.visitInsn(Opcodes.FCONST_0);
+		case Type.DOUBLE -> mv.visitInsn(Opcodes.DCONST_0);
+		case Type.OBJECT, Type.ARRAY -> mv.visitInsn(Opcodes.ACONST_NULL);
+		default -> mv.visitInsn(Opcodes.ICONST_0);
+		}
+	}
+
+	private static void pop(MethodVisitor mv, Type t) {
+		mv.visitInsn(t.getSize() == 2 ? Opcodes.POP2 : Opcodes.POP);
+	}
+
+	private void noteStub(com.isotope.model.RedirectTable.Stub st) {
+		changes[0]++;
+		if (stubsUsed != null) stubsUsed.add(st.owner().replace('/', '.') + "." + st.name() + (st.field() ? "" : "(...)") + " - " + st.reason());
 	}
 
 	private static final class Names extends Remapper {
@@ -82,6 +111,18 @@ public final class HopRemapper extends ClassRemapper {
 		return new MethodRemapper(api, methodVisitor, remapper) {
 			@Override
 			public void visitMethodInsn(int opcodeAndSource, String owner, String name, String descriptor, boolean isInterface) {
+				com.isotope.model.RedirectTable.Stub stub = mv == null ? null : hop.resolveStub(false, owner, name, descriptor);
+
+				if (stub != null) {
+					// Removed API: drop the arguments (last first), the receiver, and push a default result.
+					Type[] args = Type.getArgumentTypes(descriptor);
+					for (int k = args.length - 1; k >= 0; k--) pop(mv, args[k]);
+					if ((opcodeAndSource & 0xFF) != Opcodes.INVOKESTATIC) mv.visitInsn(Opcodes.POP);
+					pushDefault(mv, Type.getReturnType(remapper.mapMethodDesc(descriptor)));
+					noteStub(stub);
+					return;
+				}
+
 				Member rule = hop.resolveMethod(owner, name, descriptor);
 
 				if (rule != null && rule.newDesc() != null && mv != null) {
@@ -108,6 +149,33 @@ public final class HopRemapper extends ClassRemapper {
 				}
 
 				super.visitMethodInsn(opcodeAndSource, owner, name, descriptor, isInterface);
+			}
+
+			@Override
+			public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+				com.isotope.model.RedirectTable.Stub stub = mv == null ? null : hop.resolveStub(true, owner, name, descriptor);
+
+				if (stub != null) {
+					Type t = Type.getType(remapper.mapDesc(descriptor));
+
+					switch (opcode) {
+					case Opcodes.GETSTATIC -> pushDefault(mv, t);
+					case Opcodes.GETFIELD -> {
+						mv.visitInsn(Opcodes.POP);
+						pushDefault(mv, t);
+					}
+					case Opcodes.PUTSTATIC -> pop(mv, t);
+					default -> { // PUTFIELD: value, then receiver
+						pop(mv, t);
+						mv.visitInsn(Opcodes.POP);
+					}
+					}
+
+					noteStub(stub);
+					return;
+				}
+
+				super.visitFieldInsn(opcode, owner, name, descriptor);
 			}
 
 			@Override

@@ -21,8 +21,11 @@ public final class ModClass {
 	public final String[] interfaces;
 	/** Internal names of the {@code @Mixin} targets; empty for ordinary classes. */
 	public final List<String> mixinTargets;
+	/** Members this class declares itself: {@code name+desc} for methods, {@code name:desc} for fields. */
+	public final java.util.Set<String> declared;
 
-	private ModClass(String name, String superName, String[] interfaces, List<String> mixinTargets) {
+	private ModClass(String name, String superName, String[] interfaces, List<String> mixinTargets, java.util.Set<String> declared) {
+		this.declared = declared;
 		this.name = name;
 		this.superName = superName;
 		this.interfaces = interfaces == null ? new String[0] : interfaces;
@@ -37,6 +40,7 @@ public final class ModClass {
 		String[] header = new String[2];
 		String[][] ifaces = new String[1][];
 		List<String> targets = new ArrayList<>();
+		java.util.Set<String> declared = new java.util.HashSet<>();
 
 		new ClassReader(classBytes).accept(new ClassVisitor(Opcodes.ASM9) {
 			@Override
@@ -44,6 +48,18 @@ public final class ModClass {
 				header[0] = name;
 				header[1] = superName;
 				ifaces[0] = interfaces;
+			}
+
+			@Override
+			public org.objectweb.asm.FieldVisitor visitField(int access, String fname, String fdesc, String signature, Object value) {
+				declared.add(fname + ':' + fdesc);
+				return null;
+			}
+
+			@Override
+			public org.objectweb.asm.MethodVisitor visitMethod(int access, String mname, String mdesc, String signature, String[] exceptions) {
+				declared.add(mname + mdesc);
+				return null;
 			}
 
 			@Override
@@ -66,6 +82,6 @@ public final class ModClass {
 			}
 		}, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
-		return new ModClass(header[0], header[1], ifaces[0], targets);
+		return new ModClass(header[0], header[1], ifaces[0], targets, declared);
 	}
 }

@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -20,7 +19,6 @@ import net.fabricmc.loader.api.LanguageAdapter;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.ModDependency;
-import net.fabricmc.loader.api.metadata.version.VersionPredicate;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.fabricmc.loader.impl.ModContainerImpl;
 import net.fabricmc.loader.impl.discovery.ModCandidateImpl;
@@ -31,7 +29,6 @@ import net.fabricmc.loader.impl.metadata.ModMetadataParser;
 import net.fabricmc.loader.impl.metadata.VersionOverrides;
 
 import com.isotope.link.LiveIndex;
-import com.isotope.model.VersionGraph;
 
 /**
  * Everything that touches Fabric Loader's internals lives here, and only here.
@@ -58,8 +55,84 @@ final class LoaderBridge {
 
 	// ---------------------------------------------------------------- what exists right now
 
+	/**
+	 * The game's libraries (DataFixerUpper, Brigadier, Gson, ...). The class loader only gets
+	 * them once the game is unlocked, which is after Isotope runs, so they are read straight
+	 * from the jar files the game provider found. The field names differ between loader
+	 * versions, so this simply takes every collection of paths the provider holds.
+	 */
+	static final class Libraries implements LiveIndex.Source, AutoCloseable {
+		private final List<ZipFile> jars = new ArrayList<>();
+		private final List<Path> dirs = new ArrayList<>();
+
+		Libraries() {
+			java.util.Set<Path> seen = new java.util.LinkedHashSet<>();
+
+			try {
+				Object provider = FabricLoaderImpl.INSTANCE.getGameProvider();
+
+				for (Class<?> c = provider.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+					for (Field f : c.getDeclaredFields()) {
+						if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || !Collection.class.isAssignableFrom(f.getType())) continue;
+						f.setAccessible(true);
+
+						if (f.get(provider) instanceof Collection<?> col) {
+							for (Object o : col) if (o instanceof Path p) seen.add(p);
+						}
+					}
+				}
+			} catch (ReflectiveOperationException | RuntimeException e) {
+				// Without libraries the check is less complete, not wrong: unknown classes are not reported as game breakage.
+			}
+
+			try {
+				seen.addAll(FabricLauncherBase.getLauncher().getClassPath());
+			} catch (RuntimeException e) {
+				// same as above
+			}
+
+			for (Path p : seen) {
+				try {
+					if (Files.isDirectory(p)) dirs.add(p);
+					else if (Files.isRegularFile(p)) jars.add(new ZipFile(p.toFile()));
+				} catch (IOException | RuntimeException e) {
+					// not a readable jar
+				}
+			}
+		}
+
+		@Override
+		public byte[] find(String internalName) {
+			String file = internalName + ".class";
+
+			for (ZipFile zip : jars) {
+				ZipEntry e = zip.getEntry(file);
+				if (e == null) continue;
+
+				try (InputStream in = zip.getInputStream(e)) {
+					return in.readAllBytes();
+				} catch (IOException ex) {
+					// try the next jar
+				}
+			}
+
+			return readFrom(dirs, internalName);
+		}
+
+		@Override
+		public void close() {
+			for (ZipFile zip : jars) {
+				try {
+					zip.close();
+				} catch (IOException e) {
+					// nothing useful to do
+				}
+			}
+		}
+	}
+
 	/** Game jar, installed mods, libraries and JDK, as raw class bytes. */
-	static LiveIndex liveIndex() {
+	static LiveIndex liveIndex(Libraries libraries) {
 		FabricLoaderImpl loader = FabricLoaderImpl.INSTANCE;
 		List<Path> gameRoots = new ArrayList<>();
 		List<Path> modRoots = new ArrayList<>();
@@ -77,6 +150,7 @@ final class LoaderBridge {
 		// The game jar is deliberately read as a file: the class loader refuses game classes this early.
 		sources.add(name -> isGame(name) ? readFrom(gameRoots, name) : null);
 		sources.add(name -> isGame(name) ? null : readFrom(modRoots, name));
+		sources.add(libraries);
 		sources.add(name -> readResource(knot, name));
 		sources.add(name -> readResource(ClassLoader.getSystemClassLoader(), name));
 		sources.add(name -> isGame(name) ? readFrom(modRoots, name) : readFrom(gameRoots, name));
@@ -108,59 +182,6 @@ final class LoaderBridge {
 		} catch (IOException | RuntimeException e) {
 			return null;
 		}
-	}
-
-	// ---------------------------------------------------------------- which version is a mod from
-
-	/**
-	 * Reads a mod's {@code depends.minecraft} (for example {@code "~26.1.2"} or
-	 * {@code [">=26.1", "<26.3"]}) and returns the version Isotope has tables for that it
-	 * allows. If it allows several, the one closest to the running game wins: an author who
-	 * wrote {@code >=26.1 <=26.2} tested up to 26.2, so that is the shortest safe trip to 26.3.
-	 */
-	static Function<Object, String> sourceDetector(VersionGraph graph, String target) {
-		return dep -> {
-			List<String> specs = new ArrayList<>();
-			if (dep instanceof String s) specs.add(s);
-			else if (dep instanceof List<?> l) for (Object o : l) if (o instanceof String s) specs.add(s);
-			if (specs.isEmpty()) return null;
-			List<VersionPredicate> predicates = new ArrayList<>();
-
-			for (String spec : specs) {
-				try {
-					predicates.add(VersionPredicate.parse(spec));
-				} catch (Exception e) {
-					return null;
-				}
-			}
-
-			int targetIndex = target == null ? graph.known().size() - 1 : graph.known().indexOf(target);
-			String best = null;
-			int bestDistance = Integer.MAX_VALUE;
-
-			for (String id : graph.allIds()) {
-				Version v;
-
-				try {
-					v = Version.parse(id);
-				} catch (Exception e) {
-					continue;
-				}
-
-				boolean matches = false;
-				for (VersionPredicate p : predicates) if (p.test(v)) matches = true; // a list means "any of these"
-				if (!matches) continue;
-				String known = graph.normalize(id);
-				int distance = Math.abs(graph.known().indexOf(known) - targetIndex);
-
-				if (distance < bestDistance) {
-					bestDistance = distance;
-					best = known;
-				}
-			}
-
-			return best;
-		};
 	}
 
 	// ---------------------------------------------------------------- adding mods to the loader
@@ -239,8 +260,15 @@ final class LoaderBridge {
 		return new ArrayList<>(chosen.values());
 	}
 
+	/**
+	 * Mod ids that were renamed. Older mods depend on "fabric"; Fabric API stopped answering
+	 * to that name and is now only "fabric-api". Same mod, so treat the old id as satisfied.
+	 */
+	private static final Map<String, String> RENAMED_IDS = Map.of("fabric", "fabric-api");
+
 	private static Version versionOf(String modId, Map<String, Candidate> chosen) {
 		ModContainer loaded = FabricLoaderImpl.INSTANCE.getModContainer(modId).orElse(null);
+		if (loaded == null && RENAMED_IDS.containsKey(modId)) loaded = FabricLoaderImpl.INSTANCE.getModContainer(RENAMED_IDS.get(modId)).orElse(null);
 		if (loaded != null) return loaded.getMetadata().getVersion();
 
 		for (Candidate c : chosen.values()) {

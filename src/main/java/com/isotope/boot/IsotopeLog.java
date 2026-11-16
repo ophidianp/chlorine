@@ -10,18 +10,21 @@ import net.fabricmc.loader.impl.util.log.LogCategory;
 final class IsotopeLog {
 	private static final LogCategory CATEGORY = LogCategory.createCustom("Isotope");
 
+	/** The category is not always printed (it depends on the log backend in use), so tag the text too. */
+	private static final String TAG = "[Isotope] ";
+
 	private IsotopeLog() { }
 
 	static void info(String msg) {
-		Log.info(CATEGORY, msg);
+		Log.info(CATEGORY, TAG + msg);
 	}
 
 	static void warn(String msg) {
-		Log.warn(CATEGORY, msg);
+		Log.warn(CATEGORY, TAG + msg);
 	}
 
 	static void error(String msg, Throwable t) {
-		if (t == null) Log.error(CATEGORY, msg);
-		else Log.error(CATEGORY, msg, t);
+		if (t == null) Log.error(CATEGORY, TAG + msg);
+		else Log.error(CATEGORY, TAG + msg, t);
 	}
 }

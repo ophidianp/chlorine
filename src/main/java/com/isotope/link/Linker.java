@@ -1,9 +1,11 @@
 package com.isotope.link;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,9 +44,49 @@ public final class Linker {
 	/** owner name desc -> {status, access} */
 	private final Map<String, int[]> memberCache = new HashMap<>();
 
+	private final boolean dedicatedServer;
+
 	public Linker(LiveIndex index, Report report) {
+		this(index, report, false);
+	}
+
+	/**
+	 * @param dedicatedServer the dedicated server jar has no client classes at all, so a missing
+	 *                        {@code net.minecraft.client...} class proves nothing there; those are
+	 *                        listed separately instead of being counted as problems
+	 */
+	public Linker(LiveIndex index, Report report, boolean dedicatedServer) {
 		this.index = index;
 		this.report = report;
+		this.dedicatedServer = dedicatedServer;
+	}
+
+	/** "owner name+desc" of the method being checked right now, or null outside method bodies. */
+	private String currentMethod;
+
+	/**
+	 * Serious problems found inside each method, keyed "owner name+desc". Used afterwards to
+	 * tell which problems sit on code that certainly runs at startup ({@link StartupPath}).
+	 */
+	public final Map<String, List<String>> problemsByMethod = new HashMap<>();
+
+	private void problem(Report.Kind kind, String subject, String usedIn) {
+		report.problem(kind, subject, usedIn);
+
+		if (currentMethod != null && (kind == Report.Kind.MISSING_CLASS || kind == Report.Kind.MISSING_METHOD || kind == Report.Kind.MISSING_FIELD)) {
+			problemsByMethod.computeIfAbsent(currentMethod, k -> new ArrayList<>()).add(subject);
+		}
+	}
+
+	/** Packages that only exist in the client jar. */
+	public static boolean isClientOnly(String internalName) {
+		return internalName.startsWith("net/minecraft/client/") || internalName.startsWith("com/mojang/blaze3d/")
+				|| internalName.startsWith("com/mojang/renderpearl/") || internalName.startsWith("com/mojang/realmsclient/");
+	}
+
+	private Report.Kind missingKind(String internalName) {
+		if (dedicatedServer && isClientOnly(internalName)) return Report.Kind.CLIENT_ONLY;
+		return isGameName(internalName) ? Report.Kind.MISSING_CLASS : Report.Kind.NOT_INSTALLED;
 	}
 
 	public static boolean isGameName(String internalName) {
@@ -69,6 +111,7 @@ public final class Linker {
 			@Override
 			public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
 				MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
+				currentMethod = self[0] + ' ' + name + descriptor;
 
 				return new MethodVisitor(Opcodes.ASM9, mv) {
 					@Override
@@ -104,13 +147,13 @@ public final class Linker {
 							int[] r = findMember(owner, fname, fdesc, false);
 
 							if (r[0] == MISSING) {
-								report.problem(Report.Kind.MISSING_FIELD, pretty(owner) + "." + fname + " : " + fdesc, self[0]);
+								problem(Report.Kind.MISSING_FIELD, pretty(owner) + "." + fname + " : " + fdesc, self[0]);
 							} else if (r[0] == FOUND) {
 								boolean isStatic = (r[1] & Opcodes.ACC_STATIC) != 0;
 								boolean wantsStatic = opcode == Opcodes.GETSTATIC || opcode == Opcodes.PUTSTATIC;
 
 								if (isStatic != wantsStatic) {
-									report.problem(Report.Kind.MISSING_FIELD, pretty(owner) + "." + fname + " : " + fdesc
+									problem(Report.Kind.MISSING_FIELD, pretty(owner) + "." + fname + " : " + fdesc
 											+ (isStatic ? "  (is now static)" : "  (is no longer static)"), self[0]);
 								}
 							}
@@ -125,12 +168,12 @@ public final class Linker {
 							int[] r = findMember(owner, mname, mdesc, true);
 
 							if (r[0] == MISSING) {
-								report.problem(Report.Kind.MISSING_METHOD, pretty(owner) + "." + mname + mdesc, self[0]);
+								problem(Report.Kind.MISSING_METHOD, pretty(owner) + "." + mname + mdesc, self[0]);
 							} else if (r[0] == FOUND) {
 								boolean isStatic = (r[1] & Opcodes.ACC_STATIC) != 0;
 
 								if (isStatic != (opcode == Opcodes.INVOKESTATIC)) {
-									report.problem(Report.Kind.MISSING_METHOD, pretty(owner) + "." + mname + mdesc
+									problem(Report.Kind.MISSING_METHOD, pretty(owner) + "." + mname + mdesc
 											+ (isStatic ? "  (is now static)" : "  (is no longer static)"), self[0]);
 								}
 							}
@@ -160,7 +203,7 @@ public final class Linker {
 								int[] r = findMember(iface.getInternalName(), iname, sam.getDescriptor(), true);
 
 								if (r[0] == MISSING) {
-									report.problem(Report.Kind.MISSING_METHOD, pretty(iface.getInternalName()) + "." + iname + sam.getDescriptor()
+									problem(Report.Kind.MISSING_METHOD, pretty(iface.getInternalName()) + "." + iname + sam.getDescriptor()
 											+ "  (implemented by a lambda)", self[0]);
 								}
 							}
@@ -176,6 +219,7 @@ public final class Linker {
 			}
 		}, 0);
 
+		currentMethod = null;
 		checkAbstractMethods(self[0]);
 		report.callsRepaired += repaired[0];
 		return repaired[0] > 0 ? writer.toByteArray() : classBytes;
@@ -188,14 +232,14 @@ public final class Linker {
 
 		if (tag <= Opcodes.H_PUTSTATIC) { // field handles
 			if (findMember(owner, h.getName(), h.getDesc(), false)[0] == MISSING) {
-				report.problem(Report.Kind.MISSING_FIELD, pretty(owner) + "." + h.getName() + " : " + h.getDesc(), user);
+				problem(Report.Kind.MISSING_FIELD, pretty(owner) + "." + h.getName() + " : " + h.getDesc(), user);
 			}
 
 			return h;
 		}
 
 		if (findMember(owner, h.getName(), h.getDesc(), true)[0] == MISSING) {
-			report.problem(Report.Kind.MISSING_METHOD, pretty(owner) + "." + h.getName() + h.getDesc() + "  (method reference)", user);
+			problem(Report.Kind.MISSING_METHOD, pretty(owner) + "." + h.getName() + h.getDesc() + "  (method reference)", user);
 		}
 
 		ClassInfo ownerInfo = index.get(owner);
@@ -227,7 +271,7 @@ public final class Linker {
 		}
 
 		if (index.get(name) != null) return true;
-		report.problem(isGameName(name) ? Report.Kind.MISSING_CLASS : Report.Kind.NOT_INSTALLED, pretty(name), user);
+		problem(missingKind(name), pretty(name), user);
 		return false;
 	}
 
@@ -236,11 +280,13 @@ public final class Linker {
 			ClassInfo sup = index.get(superName);
 
 			if (sup == null) {
-				report.problem(isGameName(superName) ? Report.Kind.MISSING_CLASS : Report.Kind.NOT_INSTALLED, pretty(superName), name);
+				problem(missingKind(superName), pretty(superName), name);
 			} else if (sup.isInterface() && (access & Opcodes.ACC_INTERFACE) == 0) {
-				report.problem(Report.Kind.SHAPE_CHANGED, pretty(superName) + " is now an interface, but the mod extends it as a class", name);
+				problem(Report.Kind.SHAPE_CHANGED, pretty(superName) + " is now an interface, but the mod extends it as a class", name);
 			} else if ((sup.access & Opcodes.ACC_FINAL) != 0) {
-				report.problem(Report.Kind.SHAPE_CHANGED, pretty(superName) + " is now final, but the mod extends it", name);
+				problem(Report.Kind.SHAPE_CHANGED, pretty(superName) + " is now final, but the mod extends it", name);
+			} else if (sup.isSealed() && !sup.permittedSubclasses.contains(name)) {
+				problem(Report.Kind.SHAPE_CHANGED, pretty(superName) + " is now sealed, and the mod's class is not one it permits", name);
 			}
 		}
 
@@ -249,9 +295,11 @@ public final class Linker {
 				ClassInfo info = index.get(i);
 
 				if (info == null) {
-					report.problem(isGameName(i) ? Report.Kind.MISSING_CLASS : Report.Kind.NOT_INSTALLED, pretty(i), name);
+					problem(missingKind(i), pretty(i), name);
 				} else if (!info.isInterface()) {
-					report.problem(Report.Kind.SHAPE_CHANGED, pretty(i) + " is now a class, but the mod implements it as an interface", name);
+					problem(Report.Kind.SHAPE_CHANGED, pretty(i) + " is now a class, but the mod implements it as an interface", name);
+				} else if (info.isSealed() && !info.permittedSubclasses.contains(name)) {
+					problem(Report.Kind.SHAPE_CHANGED, pretty(i) + " is now sealed, and the mod's class is not one it permits", name);
 				}
 			}
 		}
@@ -346,7 +394,7 @@ public final class Linker {
 		for (Map.Entry<String, String> r : required.entrySet()) {
 			if (implemented.contains(r.getKey()) || defaults.contains(r.getKey())) continue;
 			if (!isGameName(r.getValue())) continue; // only speak for the game's API
-			report.problem(Report.Kind.NOT_IMPLEMENTED, pretty(r.getValue()) + "." + r.getKey(), className);
+			problem(Report.Kind.NOT_IMPLEMENTED, pretty(r.getValue()) + "." + r.getKey(), className);
 		}
 	}
 

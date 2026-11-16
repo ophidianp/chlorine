@@ -26,6 +26,8 @@ public final class ClassInfo {
 	public final Map<String, Integer> methods;
 	/** Key: {@code name + ':' + desc}, e.g. {@code level:Lnet/minecraft/world/level/Level;}. */
 	public final Map<String, Integer> fields;
+	/** For a sealed class or interface: the only classes allowed to extend / implement it. Empty if not sealed. */
+	public final java.util.List<String> permittedSubclasses;
 
 	public ClassInfo(String name, String superName, String[] interfaces, int access,
 			Map<String, Integer> methods, Map<String, Integer> fields) {
@@ -35,6 +37,21 @@ public final class ClassInfo {
 		this.access = access;
 		this.methods = methods;
 		this.fields = fields;
+		this.permittedSubclasses = java.util.List.of();
+	}
+
+	private ClassInfo(ClassInfo base, java.util.List<String> permitted) {
+		this.name = base.name;
+		this.superName = base.superName;
+		this.interfaces = base.interfaces;
+		this.access = base.access;
+		this.methods = base.methods;
+		this.fields = base.fields;
+		this.permittedSubclasses = permitted;
+	}
+
+	public boolean isSealed() {
+		return !permittedSubclasses.isEmpty();
 	}
 
 	public boolean isInterface() {
@@ -59,6 +76,7 @@ public final class ClassInfo {
 		Map<String, Integer> fields = new LinkedHashMap<>();
 		String[] header = new String[2];
 		String[][] ifaces = new String[1][];
+		java.util.List<String> permitted = new java.util.ArrayList<>();
 		int[] acc = new int[1];
 
 		new ClassReader(classBytes).accept(new ClassVisitor(Opcodes.ASM9) {
@@ -68,6 +86,11 @@ public final class ClassInfo {
 				header[1] = superName;
 				ifaces[0] = interfaces;
 				acc[0] = access;
+			}
+
+			@Override
+			public void visitPermittedSubclass(String permittedSubclass) {
+				permitted.add(permittedSubclass);
 			}
 
 			@Override
@@ -83,6 +106,7 @@ public final class ClassInfo {
 			}
 		}, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
-		return new ClassInfo(header[0], header[1], ifaces[0], acc[0], methods, fields);
+		ClassInfo info = new ClassInfo(header[0], header[1], ifaces[0], acc[0], methods, fields);
+		return permitted.isEmpty() ? info : new ClassInfo(info, java.util.List.copyOf(permitted));
 	}
 }

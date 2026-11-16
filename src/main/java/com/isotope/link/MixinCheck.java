@@ -31,6 +31,10 @@ public final class MixinCheck {
 
 	/** Returns the mixin's targets that exist; an empty list means the mixin has nothing left to apply to. */
 	public static List<String> check(byte[] classBytes, LiveIndex index, Report report) {
+		return check(classBytes, index, report, false);
+	}
+
+	public static List<String> check(byte[] classBytes, LiveIndex index, Report report, boolean dedicatedServer) {
 		ModClass mc = ModClass.scan(classBytes);
 		List<String> present = new ArrayList<>();
 		if (!mc.isMixin()) return present;
@@ -41,7 +45,8 @@ public final class MixinCheck {
 
 			if (info == null) {
 				// A mixin into another mod's class is normally guarded by that mod being installed.
-				if (Linker.isGameName(t)) report.problem(Report.Kind.MIXIN_TARGET, "class " + Linker.pretty(t), mc.name);
+				if (dedicatedServer && Linker.isClientOnly(t)) report.problem(Report.Kind.CLIENT_ONLY, Linker.pretty(t), mc.name);
+				else if (Linker.isGameName(t)) report.problem(Report.Kind.MIXIN_TARGET, "class " + Linker.pretty(t), mc.name);
 			} else {
 				targets.add(info);
 				present.add(t);
