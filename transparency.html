@@ -4,10 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="How Chlorine was made with Claude, what has and has not been tested, and the full chat log.">
+<meta name="theme-color" content="#0c0c0a">
 <title>Transparency · Chlorine</title>
-<link rel="icon" type="image/png" href="assets/chlorine-icon.png">
+<link rel="icon" href="assets/chlorine-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
 <link rel="stylesheet" href="assets/liquid-glass.css?v=2">
-<link rel="stylesheet" href="assets/site.css?v=13">
+<link rel="stylesheet" href="assets/site.css?v=14">
 <script src="assets/liquid-glass.js?v=2" data-auto defer></script>
 <script src="assets/chat.js?v=1" defer></script>
 </head>
@@ -17,60 +21,71 @@
   <nav aria-label="Main">
     <a href="index.html">Home</a>
     <a href="features.html">Features</a>
-    <a href="downloads.html">Download</a>
     <a href="benchmarks.html">Benchmarks</a>
     <a href="transparency.html" aria-current="page">Transparency</a>
+    <a class="cta-link" href="downloads.html">Download</a>
   </nav>
 </header>
 
 <main>
-<h1>Made with Claude. Said plainly.</h1>
+<section class="wrap hero">
+<span class="badge">Transparency</span>
+<h1>Made with Claude. <em>Said plainly.</em></h1>
 <p class="lead">Chlorine was made with Claude, Anthropic's AI, working through Claude Code. I chose what to build, tested it, and decided what shipped. This page says which parts were whose, and how much of it is still unproven.</p>
-
-<h2>At a glance</h2>
-<h3>Who wrote it: the code came from AI</h3>
-<p>The mod, its settings screen, this website and its copy were written by AI. The project's README also lists ChatGPT Codex, GitHub Copilot and Nemotron 3.5 super VL as tools used along the way. The chat log below is the <strong>Claude Code</strong> session from 1.0.5 onward, written by <span id="n-opus">Claude Opus 5.5</span> and <span id="n-sonnet">Claude Sonnet 5.5</span>.</p>
-<h3>What I did: one person steering</h3>
-<p>I set the direction, picked which ideas to build, and sent the screenshots. I tested the builds in the game on a Ryzen 5 5500 with a Radeon RX 6500 XT, and decided what to keep, rename and release. I attach each jar and publish each release myself. Claude can't see the game, so tuning followed what I reported.</p>
-<h3>Not proven: what is still unverified</h3>
-<p>The newest changes (1.0.6 to 1.0.8) have <strong>no controlled frame-time benchmark</strong>. The numbers on the Benchmarks page are sampled readings from recordings on one PC.</p>
-
-<h2 id="verify-title">What has been tested, and what hasn't.</h2>
+</section>
+<section class="wrap" style="padding-top:64px">
+<div class="grid ">
+<article class="card "><p class="label">Who wrote it</p><h3>The code came from AI</h3><p>The mod, its settings screen, this website and its copy were written by AI. The project's README also lists ChatGPT Codex, GitHub Copilot and Nemotron 3.5 super VL as tools used along the way. The chat log below is the <strong>Claude Code</strong> session from 1.0.5 onward, written by <span id="n-opus">Claude Opus 5.5</span> and <span id="n-sonnet">Claude Sonnet 5.5</span>.</p></article>
+<article class="card "><p class="label">What I did</p><h3>One person steering</h3><p>I set the direction, picked which ideas to build, and sent the screenshots. I tested the builds in the game on a Ryzen 5 5500 with a Radeon RX 6500 XT, and decided what to keep, rename and release. I attach each jar and publish each release myself. Claude can't see the game, so tuning followed what I reported.</p></article>
+<article class="card "><p class="label">Not proven</p><h3>What is still unverified</h3><p>The newest changes (1.0.6 to 1.0.8) have <strong>no controlled frame-time benchmark</strong>. The numbers on the Benchmarks page are sampled readings from recordings on one PC.</p></article>
+</div>
+</section>
+<section class="wrap section" id="verify-title">
+<div class="section-head"><p class="eyebrow">Checked and not checked</p>
+<h2>What has been tested, <em>and what hasn't.</em></h2>
 <p>These are the claims I can stand behind today, and the ones I can't yet.</p>
-<ul>
-  <li><strong>Builds compile and load</strong> (checked). Releases are built from a clean state. The 1.0.7 Sodium changes were run in a real client with Sodium 0.9.2, and the patched code was inspected to confirm the hooks landed.</li>
-  <li><strong>Only one setup was played</strong> (limited). Recent testing was on one PC and one version, Minecraft 26.3 with Sodium 0.9.2. Other hardware, other versions and large modpacks have not been tested.</li>
-  <li><strong>Frame-rate gains are unmeasured</strong> (unproven). The frame smoothing and Sodium changes are meant to soften hitches. No capture tool such as CapFrameX has been used to measure 1% lows before and after, so no gain is claimed.</li>
-  <li><strong>The memory governor is new</strong> (new). It compiles and ships in 1.0.8, but it has not been played over long sessions or benchmarked. It can't replace Java's garbage collector, which your launcher's JVM flags control.</li>
-  <li><strong>Sodium patches can switch off</strong> (fragile). They target Sodium's internal code, so a Sodium update can make them stop applying. They are written to skip quietly rather than crash, but that means a future update could silently remove their effect.</li>
-</ul>
-
-<h2 id="based-title">Built on other people's work.</h2>
+</div>
+<div class="rows">
+<div class="row"><p class="label">A · Checked</p><div><h3>Builds compile and load</h3><p>Releases are built from a clean state. The 1.0.7 Sodium changes were run in a real client with Sodium 0.9.2, and the patched code was inspected to confirm the hooks landed.</p></div></div>
+<div class="row"><p class="label">B · Limited</p><div><h3>Only one setup was played</h3><p>Recent testing was on one PC and one version, Minecraft 26.3 with Sodium 0.9.2. Other hardware, other versions and large modpacks have not been tested.</p></div></div>
+<div class="row"><p class="label">C · Unproven</p><div><h3>Frame-rate gains are unmeasured</h3><p>The frame smoothing and Sodium changes are meant to soften hitches. No capture tool such as CapFrameX has been used to measure 1% lows before and after, so no gain is claimed.</p></div></div>
+<div class="row"><p class="label">D · New</p><div><h3>The memory governor is new</h3><p>It compiles and ships in 1.0.8, but it has not been played over long sessions or benchmarked. It can't replace Java's garbage collector, which your launcher's JVM flags control.</p></div></div>
+<div class="row"><p class="label">E · Fragile</p><div><h3>Sodium patches can switch off</h3><p>They target Sodium's internal code, so a Sodium update can make them stop applying. They are written to skip quietly rather than crash, but that means a future update could silently remove their effect.</p></div></div>
+</div>
+</section>
+<section class="wrap section" id="based-title">
+<div class="section-head"><p class="eyebrow">Where it comes from</p>
+<h2>Built on <em>other people's work.</em></h2>
 <p>Chlorine is not a fork. It is a separate project that leans on these mods and tools, and it is not affiliated with any of them.</p>
-<ul>
-  <li><strong>Fabric</strong> (platform). It runs on Fabric Loader and Fabric API, with Mojang's official mappings, and uses Mixin hooks to change game behavior.</li>
-  <li><strong>Cloth Config and Mod Menu</strong> (libraries). The in-game settings screen is built with Cloth Config, which is required. Mod Menu is optional and only adds a Config button to the mod list.</li>
-  <li><strong>Sodium</strong> (required). From 1.0.3 on, Chlorine requires Sodium 0.9.2 or newer and hooks into its chunk renderer. Claude read the compiled Sodium jar to find the hook points. No Sodium source code is copied into this repository, and Sodium is not bundled: you install it yourself. Sodium is licensed under PolyForm Shield 1.0.0 by CaffeineMC.</li>
-  <li><strong>Companion mods</strong> (optional). It is designed to coexist with Lithium, FerriteCore, EntityCulling, ImmediatelyFast and Iris. None of them is required, and none of their code is in Chlorine.</li>
-  <li><strong>The licence</strong> (ARR). Chlorine is All Rights Reserved (ARR), with the copyright held by Pavan Nemani. It is not open source: the repository's LICENSE file says what you may and may not do. The 0.1.x public betas are the exception: they were released under MIT, and those releases keep it. Chlorine is not affiliated with Mojang, Microsoft, Anthropic, CaffeineMC or the mods named above.</li>
-</ul>
-
-<h2 id="log-title">The conversation itself.</h2>
+</div>
+<div class="rows">
+<div class="row"><p class="label">A · Platform</p><div><h3>Fabric</h3><p>It runs on Fabric Loader and Fabric API, with Mojang's official mappings, and uses Mixin hooks to change game behavior.</p></div></div>
+<div class="row"><p class="label">B · Libraries</p><div><h3>Cloth Config and Mod Menu</h3><p>The in-game settings screen is built with Cloth Config, which is required. Mod Menu is optional and only adds a Config button to the mod list.</p></div></div>
+<div class="row"><p class="label">C · Required</p><div><h3>Sodium</h3><p>From 1.0.3 on, Chlorine requires Sodium 0.9.2 or newer and hooks into its chunk renderer. Claude read the compiled Sodium jar to find the hook points. No Sodium source code is copied into this repository, and Sodium is not bundled: you install it yourself. Sodium is licensed under PolyForm Shield 1.0.0 by CaffeineMC.</p></div></div>
+<div class="row"><p class="label">D · Optional</p><div><h3>Companion mods</h3><p>It is designed to coexist with Lithium, FerriteCore, EntityCulling, ImmediatelyFast and Iris. None of them is required, and none of their code is in Chlorine.</p></div></div>
+<div class="row"><p class="label">E · ARR</p><div><h3>The licence</h3><p>Chlorine is All Rights Reserved (ARR), with the copyright held by Pavan Nemani. It is not open source: the repository's LICENSE file says what you may and may not do. The 0.1.x public betas are the exception: they were released under MIT, and those releases keep it. Chlorine is not affiliated with Mojang, Microsoft, Anthropic, CaffeineMC or the mods named above.</p></div></div>
+</div>
+</section>
+<section class="wrap section" id="log-title">
+<div class="section-head"><p class="eyebrow">The receipts</p>
+<h2>The conversation <em>itself.</em></h2>
 <p>From the first message of the Claude Code session to the request for this page. Only what was said in the chat is shown. Tool use is left out, and file paths, local addresses, emails and keys are masked. It reads like a messaging app, but you can't reply.</p>
+</div>
 <div class="chatlog">
   <div class="chatlog-head">
     <div><b>Claude Code · Chlorine</b><small id="chat-meta">Loading the conversation…</small></div>
-    <button class="button" type="button" id="chat-jump">Jump to start</button>
+    <button class="btn" type="button" id="chat-jump">Jump to start</button>
   </div>
   <div id="chat" tabindex="0" aria-label="Full chat log"><p class="chat-empty">Loading…</p></div>
   <div class="chatlog-foot" id="chat-foot">Read-only copy of the session. Scroll to read.</div>
 </div>
-<p class="muted">Not affiliated with Mojang, Microsoft, CaffeineMC or Anthropic.</p>
+<p class="fine" style="margin-top:14px">Not affiliated with Mojang, Microsoft, CaffeineMC or Anthropic.</p>
+</section>
 </main>
 
 <footer>
-  <p>&copy; Pavan Nemani · All Rights Reserved (ARR) · Made for the worlds you make.</p>
-  <nav aria-label="Footer"><a href="transparency.html">Transparency</a><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></nav>
+  <p class="made"><span>Made by</span> Pavan Nemani</p>
+  <p class="fine">&copy; Pavan Nemani · All Rights Reserved (ARR) · Made for the worlds you make. · <a href="https://github.com/ophidianp/chlorine">GitHub</a> <a href="https://github.com/ophidianp/chlorine/releases">Releases</a></p>
 </footer>
 </body>
 </html>

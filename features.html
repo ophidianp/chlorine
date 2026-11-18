@@ -4,10 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="What Chlorine does: adaptive tuning, gameplay-side optimization, effects and power saving, frame smoothing, Sodium integration and a memory governor.">
+<meta name="theme-color" content="#0c0c0a">
 <title>Features · Chlorine</title>
-<link rel="icon" type="image/png" href="assets/chlorine-icon.png">
+<link rel="icon" href="assets/chlorine-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
 <link rel="stylesheet" href="assets/liquid-glass.css?v=2">
-<link rel="stylesheet" href="assets/site.css?v=13">
+<link rel="stylesheet" href="assets/site.css?v=14">
 <script src="assets/liquid-glass.js?v=2" data-auto defer></script>
 </head>
 <body>
@@ -16,97 +20,112 @@
   <nav aria-label="Main">
     <a href="index.html">Home</a>
     <a href="features.html" aria-current="page">Features</a>
-    <a href="downloads.html">Download</a>
     <a href="benchmarks.html">Benchmarks</a>
     <a href="transparency.html">Transparency</a>
+    <a class="cta-link" href="downloads.html">Download</a>
   </nav>
 </header>
 
 <main>
-<h1>Small adjustments. A more considered world.</h1>
+<section class="wrap hero">
+<span class="badge">What Chlorine does</span>
+<h1>Small adjustments. <em>A more considered world.</em></h1>
 <p class="lead">Chlorine is a Fabric performance and power-management mod for Minecraft 26.3. It targets CPU-side simulation work, bursty entity effects, and laptop power usage while leaving chunk rendering and renderer internals to specialized mods.</p>
-<p class="muted">On this page: <a href="#adaptive">Adaptive tuning</a> · <a href="#world">World &amp; gameplay</a> · <a href="#comfort">Effects &amp; power</a> · <a href="#frames">Frame smoothing &amp; LOD</a> · <a href="#sodium">Sodium integration</a> · <a href="#memory">Memory</a> · <a href="#config">Configuration</a></p>
-
-<h2 id="adaptive">1. Adaptive client tuning</h2>
-<p class="muted">Adapt to the moment</p>
-<ul>
-  <li><strong>Adaptive simulation distance.</strong> Monitors a rolling FPS average and lowers simulation distance when performance falls below the configured threshold, then raises it again after a recovery cooldown.</li>
-  <li><strong>Entity-distance scaling.</strong> Can reduce the entity-distance multiplier after simulation distance reaches its configured floor.</li>
-  <li><strong>Particle fallback.</strong> Can reduce the particle setting as a last resort.</li>
-  <li><strong>Simulation-distance cap.</strong> Optionally prevents other tuning systems from raising simulation distance above a fixed ceiling.</li>
-  <li><strong>Fast-travel chunk governor.</strong> Temporarily lowers simulation distance while moving quickly (Elytra, Riptide trident), then restores it after a cooldown.</li>
-</ul>
-<p>Chlorine intentionally changes <strong>simulation distance</strong>, not render distance. Render-distance changes can rebuild the entire chunk render graph and cause a large hitch; simulation distance instead targets server ticking, entity updates, random ticks, and block updates.</p>
-
-<h2 id="world">2. Server and gameplay-side optimization</h2>
-<p class="muted">Ease background work</p>
-<ul>
-  <li><strong>Distant classic-mob AI throttle.</strong> Staggers goal-selector AI for mobs such as zombies and skeletons when no player is nearby. Physics and nearby mobs are not throttled.</li>
-  <li><strong>Distant Brain-mob throttle.</strong> Applies the same idea directly to <code>Brain.tick()</code> for villagers, piglins, hoglins, allays, frogs, and other Brain-driven mobs.</li>
-  <li><strong>Item merging.</strong> Periodically combines compatible nearby item entities around online players.</li>
-  <li><strong>XP orb merging.</strong> Combines nearby experience orbs. Verifies the internal value update before discarding an orb and disables itself for the session if that operation cannot be verified.</li>
-  <li><strong>Server tick diagnostics.</strong> Optionally logs a warning when average server tick time exceeds the configured threshold. Observability only; it does not alter server behavior.</li>
-</ul>
-
-<h2 id="comfort">3. Client effects and power saving</h2>
-<p class="muted">Make busy moments gentler</p>
-<ul>
-  <li><strong>Unfocused-window power saver.</strong> Caps FPS while the game window is unfocused or minimized and can hide clouds during that period.</li>
-  <li><strong>Sound budget.</strong> Limits how many new sounds may start in one client tick, smoothing bursts from farms, combat, or other events.</li>
-  <li><strong>Sound pre-cull.</strong> Drops very quiet distance-attenuated sounds before they reach the audio engine.</li>
-  <li><strong>Particle budget.</strong> Limits particle creation per client tick to smooth fireworks, explosions, potion clouds, and similar bursts.</li>
-  <li><strong>Beacon and portal throttles.</strong> Skips distant beacon beams and Nether portal ambient particles when enabled.</li>
-  <li><strong>Low-end auto-tune.</strong> Once per launch, detects constrained memory or CPU availability and applies lighter vanilla visual defaults.</li>
-</ul>
-
-<h2 id="frames">4. Frame smoothing and render LOD</h2>
-<p class="muted">Protect the 1% lows · new in 1.0.6</p>
-<ul>
-  <li><strong>Light update smoothing.</strong> When a large backlog of light updates builds up, processes it within a per-frame time budget instead of all at once, with a minimum amount of progress each frame.</li>
-  <li><strong>Adaptive ambient effects.</strong> Scales down ambient block effects such as dripping and smoke while the frame rate is under pressure, and restores them once it recovers.</li>
-  <li><strong>Sign text LOD.</strong> Skips drawing sign text beyond a configurable distance, where it is too small to read anyway.</li>
-  <li><strong>Item drop LOD.</strong> Draws distant dropped stacks as a single item instead of a pile of copies.</li>
-  <li><strong>Block entity LOD.</strong> Skips small, distant block entities such as chests and skulls. Large or always-visible ones, like beacon beams, are left alone.</li>
-  <li><strong>Autosave smoothing.</strong> The periodic autosave writes a limited number of chunks immediately and hands the rest to the game's own background saver, so nothing is lost and the 5-minute hitch shrinks.</li>
-</ul>
-
-<h2 id="sodium">5. Sodium-aware workload control</h2>
-<p class="muted">Work with the renderer</p>
-<ul>
-  <li><strong>Builder-pressure governor.</strong> Samples Sodium's existing chunk-builder queue and worker occupancy at the verified render-list boundary.</li>
-  <li><strong>Frame-pacing protection.</strong> Defers immediate terrain updates only when sustained low FPS, a real queued-job backlog, and a stable camera agree that synchronous work is contributing to pressure.</li>
-  <li><strong>Hysteresis and recovery.</strong> Avoids rapid toggling and restores normal behavior after the frame rate recovers or pressure clears.</li>
-  <li><strong>Adaptive chunk upload budget</strong> (new in 1.0.7). Lowers Sodium's 10 ms minimum per-frame chunk upload time so uploads can't outlast a frame at high FPS. The full budget is kept for the first seconds after joining so terrain still fills in quickly.</li>
-  <li><strong>Nearby rebuild scaling</strong> (new in 1.0.7). While FPS is low, shrinks the radius in which block changes are rebuilt and shown immediately on the main thread, which softens hitches from TNT, pistons and redstone.</li>
-  <li><strong>Async culling under pressure</strong> (new in 1.0.7). While FPS is low, keeps Sodium's visibility culling on its background thread during fast camera movement, instead of switching to the main thread.</li>
-  <li><strong>Sodium GPU profile.</strong> Can enable Sodium's exposed fog occlusion, block-face culling, and visible-texture animation settings without replacing Sodium's OpenGL renderer.</li>
-</ul>
-<p>The three 1.0.7 additions patch Sodium's internals rather than its public API. If a future Sodium version changes that code, they switch themselves off instead of crashing the game.</p>
-<p>This integration is designed for Chlorine 1.0.3+ on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
-
-<h2 id="memory">6. Memory governor</h2>
-<p class="muted">Keep the heap healthy · new in 1.0.8</p>
-<ul>
-  <li><strong>Cache trimming.</strong> Empties Chlorine's own collision cache when heap usage passes a configurable percentage, 85% by default.</li>
-  <li><strong>GC after leaving a world.</strong> Requests one garbage collection on a background thread after you leave a world, at most once a minute, so the menu never freezes. Ignored if the JVM runs with <code>-XX:+DisableExplicitGC</code>.</li>
-  <li><strong>Leak watch.</strong> Logs a warning if memory kept after garbage collections keeps growing. It only logs and never changes behavior.</li>
-</ul>
-<p>Java's garbage collector is chosen by your launcher's JVM flags, so a mod cannot replace it. For the biggest memory-related gains, use G1 or Generational ZGC with 6 to 8 GB allocated.</p>
-
-<h2 id="config">7. Your configuration</h2>
-<p class="muted">Choose what stays on</p>
+<ul class="tags" style="margin-top:28px"><li><a href="#adaptive">Adaptive tuning</a></li><li><a href="#world">World &amp; gameplay</a></li><li><a href="#comfort">Effects &amp; power</a></li><li><a href="#frames">Frame smoothing &amp; LOD</a></li><li><a href="#sodium">Sodium integration</a></li><li><a href="#memory">Memory</a></li><li><a href="#config">Configuration</a></li></ul></section>
+<section class="wrap section" id="adaptive">
+<div class="section-head"><p class="eyebrow">01 · Adapt to the moment</p>
+<h2>Adaptive client <em>tuning.</em></h2>
+</div>
+<div class="grid ">
+<article class="card wide"><h3>Adaptive simulation distance</h3><p>Monitors a rolling FPS average and lowers simulation distance when performance falls below the configured threshold, then raises it again after a recovery cooldown.</p></article>
+<article class="card "><h3>Entity-distance scaling</h3><p>Can reduce the entity-distance multiplier after simulation distance reaches its configured floor.</p></article>
+<article class="card "><h3>Particle fallback</h3><p>Can reduce the particle setting as a last resort.</p></article>
+<article class="card "><h3>Simulation-distance cap</h3><p>Optionally prevents other tuning systems from raising simulation distance above a fixed ceiling.</p></article>
+<article class="card "><h3>Fast-travel chunk governor</h3><p>Temporarily lowers simulation distance while moving quickly (Elytra, Riptide trident), then restores it after a cooldown.</p></article>
+</div>
+<p class="note" style="margin-top:14px">Chlorine intentionally changes <strong>simulation distance</strong>, not render distance. Render-distance changes can rebuild the entire chunk render graph and cause a large hitch; simulation distance instead targets server ticking, entity updates, random ticks, and block updates.</p>
+</section>
+<section class="wrap section" id="world">
+<div class="section-head"><p class="eyebrow">02 · Ease background work</p>
+<h2>Server and gameplay-side <em>optimization.</em></h2>
+</div>
+<div class="grid ">
+<article class="card "><h3>Distant classic-mob AI throttle</h3><p>Staggers goal-selector AI for mobs such as zombies and skeletons when no player is nearby. Physics and nearby mobs are not throttled.</p></article>
+<article class="card "><h3>Distant Brain-mob throttle</h3><p>Applies the same idea directly to <code>Brain.tick()</code> for villagers, piglins, hoglins, allays, frogs, and other Brain-driven mobs.</p></article>
+<article class="card "><h3>Item merging</h3><p>Periodically combines compatible nearby item entities around online players.</p></article>
+<article class="card wide"><h3>XP orb merging</h3><p>Combines nearby experience orbs. Verifies the internal value update before discarding an orb and disables itself for the session if that operation cannot be verified.</p></article>
+<article class="card "><h3>Server tick diagnostics</h3><p>Optionally logs a warning when average server tick time exceeds the configured threshold. Observability only; it does not alter server behavior.</p></article>
+</div>
+</section>
+<section class="wrap section" id="comfort">
+<div class="section-head"><p class="eyebrow">03 · Make busy moments gentler</p>
+<h2>Client effects and <em>power saving.</em></h2>
+</div>
+<div class="grid ">
+<article class="card "><h3>Unfocused-window power saver</h3><p>Caps FPS while the game window is unfocused or minimized and can hide clouds during that period.</p></article>
+<article class="card "><h3>Sound budget</h3><p>Limits how many new sounds may start in one client tick, smoothing bursts from farms, combat, or other events.</p></article>
+<article class="card "><h3>Sound pre-cull</h3><p>Drops very quiet distance-attenuated sounds before they reach the audio engine.</p></article>
+<article class="card "><h3>Particle budget</h3><p>Limits particle creation per client tick to smooth fireworks, explosions, potion clouds, and similar bursts.</p></article>
+<article class="card "><h3>Beacon and portal throttles</h3><p>Skips distant beacon beams and Nether portal ambient particles when enabled.</p></article>
+<article class="card "><h3>Low-end auto-tune</h3><p>Once per launch, detects constrained memory or CPU availability and applies lighter vanilla visual defaults.</p></article>
+</div>
+</section>
+<section class="wrap section" id="frames">
+<div class="section-head"><p class="eyebrow">04 · Protect the 1% lows · new in 1.0.6</p>
+<h2>Frame smoothing and <em>render LOD.</em></h2>
+</div>
+<div class="grid ">
+<article class="card "><h3>Light update smoothing</h3><p>When a large backlog of light updates builds up, processes it within a per-frame time budget instead of all at once, with a minimum amount of progress each frame.</p></article>
+<article class="card "><h3>Adaptive ambient effects</h3><p>Scales down ambient block effects such as dripping and smoke while the frame rate is under pressure, and restores them once it recovers.</p></article>
+<article class="card "><h3>Sign text LOD</h3><p>Skips drawing sign text beyond a configurable distance, where it is too small to read anyway.</p></article>
+<article class="card "><h3>Item drop LOD</h3><p>Draws distant dropped stacks as a single item instead of a pile of copies.</p></article>
+<article class="card "><h3>Block entity LOD</h3><p>Skips small, distant block entities such as chests and skulls. Large or always-visible ones, like beacon beams, are left alone.</p></article>
+<article class="card "><h3>Autosave smoothing</h3><p>The periodic autosave writes a limited number of chunks immediately and hands the rest to the game's own background saver, so nothing is lost and the 5-minute hitch shrinks.</p></article>
+</div>
+</section>
+<section class="wrap section" id="sodium">
+<div class="section-head"><p class="eyebrow">05 · Work with the renderer</p>
+<h2>Sodium-aware <em>workload control.</em></h2>
+</div>
+<div class="grid ">
+<article class="card "><h3>Builder-pressure governor</h3><p>Samples Sodium's existing chunk-builder queue and worker occupancy at the verified render-list boundary.</p></article>
+<article class="card "><h3>Frame-pacing protection</h3><p>Defers immediate terrain updates only when sustained low FPS, a real queued-job backlog, and a stable camera agree that synchronous work is contributing to pressure.</p></article>
+<article class="card "><h3>Hysteresis and recovery</h3><p>Avoids rapid toggling and restores normal behavior after the frame rate recovers or pressure clears.</p></article>
+<article class="card "><h3>Adaptive chunk upload budget · new in 1.0.7</h3><p>Lowers Sodium's 10 ms minimum per-frame chunk upload time so uploads can't outlast a frame at high FPS. The full budget is kept for the first seconds after joining so terrain still fills in quickly.</p></article>
+<article class="card "><h3>Nearby rebuild scaling · new in 1.0.7</h3><p>While FPS is low, shrinks the radius in which block changes are rebuilt and shown immediately on the main thread, which softens hitches from TNT, pistons and redstone.</p></article>
+<article class="card "><h3>Async culling under pressure · new in 1.0.7</h3><p>While FPS is low, keeps Sodium's visibility culling on its background thread during fast camera movement, instead of switching to the main thread.</p></article>
+<article class="card wide"><h3>Sodium GPU profile</h3><p>Can enable Sodium's exposed fog occlusion, block-face culling, and visible-texture animation settings without replacing Sodium's OpenGL renderer.</p></article>
+</div>
+<p class="note" style="margin-top:14px">The three 1.0.7 additions patch Sodium's internals rather than its public API. If a future Sodium version changes that code, they switch themselves off instead of crashing the game. This integration is designed for Chlorine 1.0.3+ on Minecraft 26.3 and requires Sodium 0.9.2 or newer. It does not add entity culling, replace Sodium's worker pool, or claim an unverified GPU speedup.</p>
+</section>
+<section class="wrap section" id="memory">
+<div class="section-head"><p class="eyebrow">06 · Keep the heap healthy · new in 1.0.8</p>
+<h2>Memory <em>governor.</em></h2>
+</div>
+<div class="grid ">
+<article class="card "><h3>Cache trimming</h3><p>Empties Chlorine's own collision cache when heap usage passes a configurable percentage, 85% by default.</p></article>
+<article class="card "><h3>GC after leaving a world</h3><p>Requests one garbage collection on a background thread after you leave a world, at most once a minute, so the menu never freezes. Ignored if the JVM runs with <code>-XX:+DisableExplicitGC</code>.</p></article>
+<article class="card "><h3>Leak watch</h3><p>Logs a warning if memory kept after garbage collections keeps growing. It only logs and never changes behavior.</p></article>
+</div>
+<p class="note" style="margin-top:14px">Java's garbage collector is chosen by your launcher's JVM flags, so a mod cannot replace it. For the biggest memory-related gains, use G1 or Generational ZGC with 6 to 8 GB allocated.</p>
+</section>
+<section class="wrap section" id="config">
+<div class="section-head"><p class="eyebrow">07 · Choose what stays on</p>
+<h2>Your <em>configuration.</em></h2>
 <p>All features are independently configurable and can be disabled without removing the mod. Configure them in-game with Cloth Config, optionally surfaced through Mod Menu, or edit <code>config/chlorine.json</code> directly.</p>
-<p>The in-game config screen groups settings into these categories (the last five are new or expanded in 1.0.6, 1.0.7 and 1.0.8): Simulation Distance Cap, Adaptive Scaler, Power Saver, Mob AI Throttle, Item Merging, XP Orb Merging, Sound Budget, Particle Budget, Low-End Auto-Tune, Beacon &amp; Portal Throttle, Chunk Gen Governor, Sound Pre-Cull, Tick Diagnostics, Frame Smoothing, Render LOD, Sodium Workload Governors, Sodium GPU Profile, Memory Governor.</p>
-<p>Chlorine 1.0.3+ requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
-
-<hr>
-<h2>Results depend on your world.</h2>
+</div>
+<article class="card "><p class="label">Config categories</p><p>The in-game config screen groups settings into these categories · highlighted ones are new or expanded in 1.0.6, 1.0.7 and 1.0.8</p><ul class="tags"><li>Simulation Distance Cap</li><li>Adaptive Scaler</li><li>Power Saver</li><li>Mob AI Throttle</li><li>Item Merging</li><li>XP Orb Merging</li><li>Sound Budget</li><li>Particle Budget</li><li>Low-End Auto-Tune</li><li>Beacon &amp; Portal Throttle</li><li>Chunk Gen Governor</li><li>Sound Pre-Cull</li><li class="on">Frame Smoothing</li><li class="on">Render LOD</li><li class="on">Sodium Workload Governors</li><li>Sodium GPU Profile</li><li>Tick Diagnostics</li><li class="on">Memory Governor</li></ul></article><p class="muted" style="margin-top:18px">Chlorine 1.0.3+ requires Sodium for its direct renderer integration. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris, and Mod Menu remain optional companions.</p>
+</section>
+<section class="wrap"><div class="cta">
+<h2>Results depend on <em>your world.</em></h2>
 <p>Entity count, hardware, and other installed mods all matter. Defaults are conservative, not universal benchmarks. Sodium's workload governor is intended to protect frame pacing under chunk-build pressure, not guarantee a universal FPS increase.</p>
+<div class="actions"><a class="btn primary" href="downloads.html">Download Chlorine ↓</a><a class="btn" href="benchmarks.html">See the benchmarks →</a></div>
+</div></section>
 </main>
 
 <footer>
-  <p>&copy; Pavan Nemani · All Rights Reserved (ARR) · Made for the worlds you make.</p>
-  <nav aria-label="Footer"><a href="transparency.html">Transparency</a><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></nav>
+  <p class="made"><span>Made by</span> Pavan Nemani</p>
+  <p class="fine">&copy; Pavan Nemani · All Rights Reserved (ARR) · Made for the worlds you make. · <a href="https://github.com/ophidianp/chlorine">GitHub</a> <a href="https://github.com/ophidianp/chlorine/releases">Releases</a></p>
 </footer>
 </body>
 </html>

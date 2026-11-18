@@ -4,10 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Chlorine is a configurable Fabric performance and power-management mod for Minecraft.">
+<meta name="theme-color" content="#0c0c0a">
 <title>Chlorine</title>
-<link rel="icon" type="image/png" href="assets/chlorine-icon.png">
+<link rel="icon" href="assets/chlorine-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
 <link rel="stylesheet" href="assets/liquid-glass.css?v=2">
-<link rel="stylesheet" href="assets/site.css?v=13">
+<link rel="stylesheet" href="assets/site.css?v=14">
 <script src="assets/liquid-glass.js?v=2" data-auto defer></script>
 </head>
 <body>
@@ -16,75 +20,95 @@
   <nav aria-label="Main">
     <a href="index.html" aria-current="page">Home</a>
     <a href="features.html">Features</a>
-    <a href="downloads.html">Download</a>
     <a href="benchmarks.html">Benchmarks</a>
     <a href="transparency.html">Transparency</a>
+    <a class="cta-link" href="downloads.html">Download</a>
   </nav>
 </header>
 
 <main>
-<h1>A smoother world, without the noise.</h1>
+<section class="wrap hero">
+<span class="badge">Fabric performance mod · <b>v1.0.8</b></span>
+<h1>A smoother world,<br><em>without the noise.</em></h1>
 <p class="lead">Chlorine fine-tunes the work happening behind your Minecraft world—so busy moments feel a little less busy.</p>
-<div class="actions">
-  <a class="button primary" href="downloads.html?version=26.3">Download for 26.3</a>
-  <a class="button" href="features.html">See the features</a>
+<div class="actions"><a class="btn primary" href="downloads.html?version=26.3">Download for 26.3 ↓</a><a class="btn" href="features.html">See the features →</a></div>
+<p class="fine">For Fabric · Minecraft 26.2 and 26.3 · Free and open source</p>
+<div class="wrap" style="width:auto;margin-top:56px"><div class="stats">
+<div class="stat"><span>Version</span><b>1.0.8</b><small>latest release</small></div>
+<div class="stat"><span>Minecraft</span><b>26.2 · 26.3</b><small>Fabric</small></div>
+<div class="stat"><span>Requires</span><b>Sodium</b><small>0.9.2+ for 1.0.3+</small></div>
+<div class="stat"><span>Settings</span><b>18</b><small>config categories</small></div>
 </div>
-<p class="muted">For Fabric · Minecraft 26.2 and 26.3 · Free and open source</p>
-<ol>
-  <li>Thoughtful performance</li>
-  <li>Every feature is optional</li>
-  <li>Your settings stay yours</li>
-</ol>
-
-<h2>Keep the details. Spend less time waiting.</h2>
+</div></section>
+<section class="wrap" style="padding-top:14px">
+<div class="grid ">
+<article class="card "><p class="label">01</p><h3>Thoughtful performance</h3><p></p></article>
+<article class="card "><p class="label">02</p><h3>Every feature is optional</h3><p></p></article>
+<article class="card "><p class="label">03</p><h3>Your settings stay yours</h3><p></p></article>
+</div>
+</section>
+<section class="wrap section">
+<div class="section-head"><p class="eyebrow">A lighter touch</p>
+<h2>Keep the details. <em>Spend less time waiting.</em></h2>
 <p>From distant mob AI to bursts of particles and sounds, Chlorine offers small, configurable adjustments to the work that can add up during play.</p>
-<ul>
-  <li><strong>Adaptive tuning</strong> (client): adjust simulation distance as performance changes, with optional entity-distance and particle fallbacks. <a href="features.html#adaptive">Explore adaptive tuning</a></li>
-  <li><strong>Calmer crowds</strong> (world): throttle distant mob AI and merge nearby item drops and XP orbs through independent settings. <a href="features.html#world">Explore world features</a></li>
-  <li><strong>Quieter bursts</strong> (comfort): set budgets for sounds and particles, and save power when the game window is unfocused. <a href="features.html#comfort">Explore comfort features</a></li>
-</ul>
-
-<h2>Less background strain. More room to play.</h2>
-<p>Minecraft has a lot going on at once. Chlorine focuses on the parts you can tune, without trying to replace the systems that already do their job well.</p>
-<ul>
-  <li><strong>Simulation that can scale.</strong> Give the world a little breathing room when frames dip, then let it recover when things settle.</li>
-  <li><strong>Distant activity, handled gently.</strong> Throttle distant mob decision-making while leaving nearby mobs and their physics alone.</li>
-  <li><strong>Effects with a sensible budget.</strong> Keep bursts of sounds and particles from piling up all at once, one optional setting at a time.</li>
-  <li><strong>Power saving when you step away.</strong> Lower the FPS cap while the game is unfocused, with an option to hide clouds too.</li>
-  <li><strong>Steadier frame times.</strong> Spread light-update bursts and the periodic autosave over several frames, and skip far-away detail you can't see anyway.</li>
-</ul>
-
-<h2>Your game. Your settings. Your call.</h2>
-<ol>
-  <li><strong>Install.</strong> Add Chlorine to your Fabric instance alongside Fabric API and Cloth Config.</li>
-  <li><strong>Choose.</strong> Open the config screen or edit the JSON file. Every feature can be switched off.</li>
-  <li><strong>Fine-tune.</strong> Start with the defaults and adjust gradually for your world and hardware.</li>
-</ol>
-<p><a href="downloads.html">Get started with Chlorine</a></p>
-
-<h2>Fits into the mods you already use.</h2>
-<p>Chlorine 1.0.8 works directly with Sodium's 26.3 renderer while the other companions remain optional.</p>
-<ul>
-  <li>Sodium · required for 1.0.3+</li>
-  <li>Lithium, FerriteCore, EntityCulling, ImmediatelyFast, Iris · optional</li>
-</ul>
-<p class="muted">Sodium, Fabric API, and Cloth Config are required for 1.0.3+ · other companions are optional</p>
-
-<h2>A few quick answers.</h2>
-<div class="faq">
-  <details><summary>Does Chlorine change render distance?</summary><p>No. Its adaptive tuning works with simulation distance; render distance is intentionally left alone to avoid expensive chunk render graph rebuilds.</p></details>
-  <details><summary>Do I need another performance mod?</summary><p>For Chlorine 1.0.3+ on Minecraft 26.3, Sodium 0.9.2 or newer is required because the workload governor integrates with Sodium's renderer. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris remain optional.</p></details>
-  <details><summary>Will it improve performance in every world?</summary><p>Results depend on your hardware, world, entity count, and mod setup. Chlorine provides configurable tools, not a universal FPS guarantee.</p></details>
 </div>
-
-<h2>Find your version. Make it yours.</h2>
+<div class="grid two">
+<article class="card tall"><p class="label">01 / Client</p><p class="serif">Adaptive tuning</p><p>Adjust simulation distance as performance changes, with optional entity-distance and particle fallbacks.</p><ul class="tags"><li class="on">simulation distance</li><li>entity distance</li><li>particles</li><li>fast travel</li></ul><a class="more" href="features.html#adaptive">Explore adaptive tuning →</a></article>
+<article class="card "><p class="label">02 / World</p><h3>Calmer crowds</h3><p>Throttle distant mob AI and merge nearby item drops and XP orbs through independent settings.</p><a class="more" href="features.html#world">Explore world features →</a></article>
+<article class="card "><p class="label">03 / Comfort</p><h3>Quieter bursts</h3><p>Set budgets for sounds and particles, and save power when the game window is unfocused.</p><a class="more" href="features.html#comfort">Explore comfort features →</a></article>
+</div>
+<p style="margin-top:22px"><a class="btn" href="features.html">See what it can do ↗</a></p>
+</section>
+<section class="wrap section split">
+<div class="section-head"><p class="eyebrow">Built around the busy bits</p>
+<h2>Less background strain. <em>More room to play.</em></h2>
+<p>Minecraft has a lot going on at once. Chlorine focuses on the parts you can tune, without trying to replace the systems that already do their job well.</p>
+</div>
+<div class="rows">
+<div class="row"><p class="label">Client</p><div><h3>Simulation that can scale</h3><p>Give the world a little breathing room when frames dip, then let it recover when things settle.</p></div></div>
+<div class="row"><p class="label">World</p><div><h3>Distant activity, handled gently</h3><p>Throttle distant mob decision-making while leaving nearby mobs and their physics alone.</p></div></div>
+<div class="row"><p class="label">Effects</p><div><h3>Effects with a sensible budget</h3><p>Keep bursts of sounds and particles from piling up all at once, one optional setting at a time.</p></div></div>
+<div class="row"><p class="label">Comfort</p><div><h3>Power saving when you step away</h3><p>Lower the FPS cap while the game is unfocused, with an option to hide clouds too.</p></div></div>
+<div class="row"><p class="label">Frames</p><div><h3>Steadier frame times</h3><p>Spread light-update bursts and the periodic autosave over several frames, and skip far-away detail you can't see anyway.</p></div></div>
+</div>
+</section>
+<section class="wrap section">
+<div class="section-head"><p class="eyebrow">Simple by design</p>
+<h2>Your game. Your settings. <em>Your call.</em></h2>
+</div>
+<ol class="steps">
+<li><h3>Install</h3><p>Add Chlorine to your Fabric instance alongside Fabric API and Cloth Config.</p></li>
+<li><h3>Choose</h3><p>Open the config screen or edit the JSON file. Every feature can be switched off.</p></li>
+<li><h3>Fine-tune</h3><p>Start with the defaults and adjust gradually for your world and hardware.</p></li>
+</ol>
+<p style="margin-top:22px"><a class="btn" href="downloads.html">Get started with Chlorine ↗</a></p>
+</section>
+<section class="wrap section split">
+<div class="section-head"><p class="eyebrow">A good neighbor</p>
+<h2>Fits into the <em>mods you already use.</em></h2>
+<p>Chlorine 1.0.8 works directly with Sodium's 26.3 renderer while the other companions remain optional.</p>
+</div>
+<article class="card "><p class="label">Companions</p><p>Sodium, Fabric API, and Cloth Config are required for 1.0.3+ · other companions are optional</p><ul class="tags"><li class="on">Sodium · required for 1.0.3+</li><li>Lithium</li><li>FerriteCore</li><li>EntityCulling</li><li>ImmediatelyFast</li><li>Iris</li></ul></article></section>
+<section class="wrap section split" style="align-items:start">
+<div class="section-head"><p class="eyebrow">Good to know</p>
+<h2>A few quick <em>answers.</em></h2>
+</div>
+<div class="faq">
+<details><summary>Does Chlorine change render distance?</summary><p>No. Its adaptive tuning works with simulation distance; render distance is intentionally left alone to avoid expensive chunk render graph rebuilds.</p></details>
+<details><summary>Do I need another performance mod?</summary><p>For Chlorine 1.0.3+ on Minecraft 26.3, Sodium 0.9.2 or newer is required because the workload governor integrates with Sodium's renderer. Lithium, FerriteCore, EntityCulling, ImmediatelyFast, and Iris remain optional.</p></details>
+<details><summary>Will it improve performance in every world?</summary><p>Results depend on your hardware, world, entity count, and mod setup. Chlorine provides configurable tools, not a universal FPS guarantee.</p></details>
+</div>
+</section>
+<section class="wrap"><div class="cta">
+<h2>Find your version. <em>Make it yours.</em></h2>
 <p>Pick Minecraft 26.2 or 26.3. Downloads are linked directly to the latest matching GitHub release.</p>
-<p><a class="button primary" href="downloads.html">Choose a version</a></p>
+<div class="actions"><a class="btn primary" href="downloads.html">Choose a version →</a></div>
+</div></section>
 </main>
 
 <footer>
-  <p>&copy; Pavan Nemani · All Rights Reserved (ARR) · Made for the worlds you make.</p>
-  <nav aria-label="Footer"><a href="transparency.html">Transparency</a><a href="https://github.com/ophidianp/chlorine">GitHub</a><a href="https://github.com/ophidianp/chlorine/releases">Releases</a></nav>
+  <p class="made"><span>Made by</span> Pavan Nemani</p>
+  <p class="fine">&copy; Pavan Nemani · All Rights Reserved (ARR) · Made for the worlds you make. · <a href="https://github.com/ophidianp/chlorine">GitHub</a> <a href="https://github.com/ophidianp/chlorine/releases">Releases</a></p>
 </footer>
 </body>
 </html>
