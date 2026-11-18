@@ -152,29 +152,6 @@ document.querySelectorAll("[data-count]").forEach((element) => {
   observer.observe(element);
 });
 
-/* ---------- Pointer effects: card spotlight + magnetic buttons ---------- */
-const finePointer = window.matchMedia("(pointer: fine)").matches;
-if (finePointer && !reduceMotion) {
-  document.querySelectorAll(".card").forEach((card) => {
-    card.addEventListener("pointermove", (event) => {
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty("--mx", `${event.clientX - rect.left}px`);
-      card.style.setProperty("--my", `${event.clientY - rect.top}px`);
-    });
-  });
-  document.querySelectorAll(".btn-primary, .btn-ghost").forEach((button) => {
-    button.addEventListener("pointermove", (event) => {
-      const rect = button.getBoundingClientRect();
-      button.style.setProperty("--bx", `${(event.clientX - rect.left - rect.width / 2) * 0.18}px`);
-      button.style.setProperty("--by", `${(event.clientY - rect.top - rect.height / 2) * 0.28}px`);
-    });
-    button.addEventListener("pointerleave", () => {
-      button.style.setProperty("--bx", "0px");
-      button.style.setProperty("--by", "0px");
-    });
-  });
-}
-
 /* ---------- Features page table of contents ---------- */
 const tocLinks = [...document.querySelectorAll(".toc a")];
 if (tocLinks.length && "IntersectionObserver" in window) {
@@ -218,16 +195,8 @@ document.querySelectorAll(".lab").forEach((lab) => {
 (() => {
   const LG = window.LiquidGlass;
   if (!LG) return;
-  // Strongest glass first: only the first 25 get the lens filter, the rest stay blur-only (keeps the GPU cool).
-  const tiers = [
-    [".site-header, .hero-readout", 70],
-    [".release-panel, .version-picker, .demo, .callout", 55],
-    [".card, .result, .feature-item, .chips", 50],
-    [".btn-ghost, .theme-toggle, .menu-toggle, .chip", 44],
-  ];
-  for (const [sel, s] of tiers) document.querySelectorAll(sel).forEach((el) => LG.glassify(el, s));
-  document.querySelectorAll(".release-panel, .demo, .callout").forEach((el) => el.classList.add("lg-strong"));
-  LG.init({ max: 25 });
-  document.querySelectorAll(".lab-tabs").forEach((c) => LG.attachLens(c, ".lab-tab"));
+  // Liquid glass on the header only; the rest of the page uses plain solid surfaces.
+  document.querySelectorAll(".site-header").forEach((el) => LG.glassify(el, 70));
+  LG.init({ max: 1 });
   menuToggle?.addEventListener("click", () => { if (siteNav?.classList.contains("is-open")) LG.morphFrom(menuToggle, siteNav, 520); });
 })();
