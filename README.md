@@ -9,9 +9,10 @@ This branch hosts the Chlorine website, deployed via GitHub Pages at the reposit
 - **Benchmarks** — `benchmarks.html`
 - **404** — `404.html`
 
-Shared assets: `assets/site.css` (styles and motion), `assets/site.js` (theme,
-navigation, scroll reveals), `assets/demos.js` (the interactive feature demos
-on Home and Features) and `assets/releases.js` (live download data).
+Shared assets: `assets/site.css` (one plain, minimal stylesheet; light and dark follow
+the visitor's system), `assets/liquid-glass.*` (the glass effect, used on the header
+only), `assets/releases.js` (live download data) and `assets/chat.js` (the chat log on
+the Transparency page). Pages are plain HTML with no build step.
 
 The current Minecraft 26.3 / Chlorine 1.0.8 release requires Sodium 0.9.2
 or newer. The site describes the Sodium-aware workload governor, which uses
