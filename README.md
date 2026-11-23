@@ -3,16 +3,27 @@
 This branch hosts the Chlorine website, deployed via GitHub Pages at the repository root.
 
 ## Pages
-- **Home** â€” `index.html`
-- **Features** â€” `features.html`
-- **Download** â€” `downloads.html` (live GitHub Releases, Minecraft 26.2 / 26.3)
-- **Benchmarks** â€” `benchmarks.html`
-- **404** â€” `404.html`
+- **Home** — `index.html`
+- **Features** — `features.html`
+- **Download** — `downloads.html` (live GitHub Releases, Minecraft 26.2 / 26.3)
+- **Benchmarks** — `benchmarks.html`
+- **Transparency** — `transparency.html` (how it was made, plus the chat log)
+- **404** — `404.html`
 
-Shared assets: `assets/site.css` (one plain, minimal stylesheet; light and dark follow
-the visitor's system), `assets/liquid-glass.*` (the glass effect, used on the header
-only), `assets/releases.js` (live download data) and `assets/chat.js` (the chat log on
-the Transparency page). Pages are plain HTML with no build step.
+The design follows the Mouse 33 site: a floating header, an oversized hero, scroll
+reveals, a pinned scroll stage on the home page, light and dark themes with a toggle,
+and Chlorine's own sky-blue accent. Shared assets: `assets/site.css` (all styles),
+`assets/site.js` (theme toggle, header and mobile menu, pinned stage, FAQ, first-visit
+preloader), `assets/releases.js` (live download data) and `assets/chat.js` (the chat
+log on the Transparency page). Pages are plain HTML with no build step.
+
+## Logo
+
+The "chlorine" wordmark is drawn by `brand/logo_gen.py`: a flat pen nib swept along
+Bezier centrelines, unioned and slanted 44°, the same technique as the Mouse 33 logo.
+`python -I brand/make_assets.py` rewrites `brand/logo.svg`, `brand/logo.json` (the
+path each page inlines as `<symbol id="cl">`), `favicon.svg`, `apple-touch-icon.png`
+and `og.png`. It needs numpy, shapely and Pillow.
 
 The current Minecraft 26.3 / Chlorine 1.0.8 release requires Sodium 0.9.2
 or newer. The site describes the Sodium-aware workload governor, which uses
