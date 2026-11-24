@@ -7,15 +7,13 @@ This branch hosts the Chlorine website, deployed via GitHub Pages at the reposit
 - **Features** — `features.html`
 - **Download** — `downloads.html` (live GitHub Releases, Minecraft 26.2 / 26.3)
 - **Benchmarks** — `benchmarks.html`
-- **Transparency** — `transparency.html` (how it was made, plus the chat log)
 - **404** — `404.html`
 
 The design follows the Mouse 33 site: a floating header, an oversized hero, scroll
 reveals, a pinned scroll stage on the home page, light and dark themes with a toggle,
 and Chlorine's own sky-blue accent. Shared assets: `assets/site.css` (all styles),
 `assets/site.js` (theme toggle, header and mobile menu, pinned stage, FAQ, first-visit
-preloader), `assets/releases.js` (live download data) and `assets/chat.js` (the chat
-log on the Transparency page). Pages are plain HTML with no build step.
+preloader) and `assets/releases.js` (live download data). Pages are plain HTML with no build step.
 
 ## Logo
 
